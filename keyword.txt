@@ -1,0 +1,16 @@
+int
+double
+string
+return
+for
+while
+break
+continue
+if
+main
+return
+switch
+and
+or
+not
+case
