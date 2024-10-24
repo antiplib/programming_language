@@ -4,12 +4,8 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
-#include <unistd.h>
-
 #include <fcntl.h>
-
-#include <map>
-#include <keywords.h>
+#include "keywords.h"
 
 enum TokenType {
     KEYWORD, IDENTIFIER, LITERAL, OPERATOR, PUNCTUATION, POINT,COMMA, BRACKETS, OTHER
@@ -28,7 +24,6 @@ struct Token {
         return os;
     }
 };
-
 void create_bor(Bor bor) {
     std::ifstream fin("keyword.txt");
     std::string s;
@@ -39,15 +34,16 @@ void create_bor(Bor bor) {
 
 
 }
-
-int main() {
-    system("chcp 65001");
+int  read_file() {
     std::ifstream in("code.txt");
     in.seekg (0, std::ios::end);
-    int size = 0;
-    size = in.tellg();
+    int size_file = in.tellg();
     in.close();
-    setlocale(LC_ALL, "ru_RU.UTF-8");
+    return size_file;
+}
+int main() {
+
+    int size = read_file();
     int fd = open("code.txt", O_RDWR);
     char * buffer = (char*) malloc(size);
     read(fd, buffer, size);
@@ -109,6 +105,7 @@ int main() {
         std::cout << token << std::endl;
     }
 
+
+
     return 0;
 }
-
