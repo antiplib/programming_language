@@ -116,7 +116,7 @@ void solve(){
                         tokens.push_back(Token(BRACKETS, lexeme, line));
                         --position;
                     } else if(lexeme == ">" || lexeme == "<" || lexeme == "=" ||
-                        lexeme == "!" ) {
+                        lexeme == "!" || lexeme == "%") {
                         if(position < size) {
                             if(*(buffer + position) == '=') {
                                 lexeme += *(buffer + position);
