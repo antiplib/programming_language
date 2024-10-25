@@ -31,15 +31,18 @@ struct Token {
 };
 
 void create_bor(Bor bor) {
-    std::ifstream fin("keyword.txt");
+    std::ifstream fin("/Users/antiplib/programming_language/keyword.txt");
     std::string s;
+
+
     while (getline(fin, s)) {
+        s.erase(s.end() - 1);
         bor.add(s);
     }
     fin.close();
 }
 int  read_file() {
-    std::ifstream in("code.txt");
+    std::ifstream in("/Users/antiplib/programming_language/code.txt");
     in.seekg (0, std::ios::end);
     int size_file = in.tellg();
     in.close();
@@ -47,8 +50,8 @@ int  read_file() {
 }
 
 void solve(){
-   int size = read_file();
-    int fd = open("code.txt", O_RDWR);
+    int size = read_file();
+    int fd = open("/Users/antiplib/programming_language/code.txt", O_RDWR);
     char * buffer = (char*) malloc(size);
     read(fd, buffer, size);
 
@@ -60,10 +63,8 @@ void solve(){
     int position = 0;
     int line = 1;
     while (position < size) {
-
         if (*(buffer + position) == '\n') {
             line++;
-
         }
         if (*(buffer + position) == ' ') {
             position++;
@@ -77,16 +78,15 @@ void solve(){
                 lexeme += *(buffer + position);
                 position++;
             }
-
-
-
-
-
             if (keywords.check(lexeme)) {
                 tokens.push_back(Token(KEYWORD, lexeme, line));
+                std::cout <<*(buffer+ position);
             } else {
-                if (lexeme == " " &&  lexeme == "") {
+                    if(lexeme.size() != 0) {
 
+                        tokens.push_back(Token(LITERAL, lexeme, line));
+                        continue;
+                    }
                    while (position < size && *(buffer + position) == ' ') {
                        ++position;
                    }
@@ -107,8 +107,9 @@ void solve(){
                                 --position;
                             }
                         }
-                    } else if(lexeme == "(" ||lexeme ==")") {
+                    } else if(lexeme == "(" || lexeme ==")") {
                         tokens.push_back(Token(BRACKETS, lexeme, line));
+                        --position;
                     } else if(lexeme == ">" || lexeme == "<" || lexeme == "=" ||
                         lexeme == "!" ) {
                         if(position < size) {
@@ -121,6 +122,7 @@ void solve(){
                             }
                         }
                     } else if(lexeme == ";" || lexeme == "{" || lexeme == "}") {
+
                         tokens.push_back(Token(PUNCTUATION, lexeme, line));
                         --position;
                     } else if(lexeme == ".") {
@@ -129,13 +131,16 @@ void solve(){
                     } else if(lexeme == ",") {
                         tokens.push_back(Token(COMMA, lexeme, line));
                         --position;
-                    } else {
-                        while(position < size && (isalpha(*(buffer + position)) || *(buffer + position) -'0' >= 0 && *(buffer + position) - '0' <= 9)) {
+                    } else if(*(buffer + position) != '\n'){
+                        while(*(buffer + position) != '\n' && position < size && (isalpha(*(buffer + position)) || *(buffer + position) -'0' >= 0 && *(buffer + position) - '0' <= 9)) {
                             lexeme += *(buffer + position);
+                            ++position;
                         }
                         tokens.push_back(Token(LITERAL, lexeme, line));
+                    } else {
+                        line++;
                     }
-                }
+
             }
 //            std::string s2 = "";
 //            s2 += *(buffer + position);

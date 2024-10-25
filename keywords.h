@@ -23,8 +23,6 @@ public:
     bool check(const std::string& s) {
         node *cur = root;
         for (auto u: s) {
-            if(u - 'a' < 0)
-                return 0;
             if (cur->next[u - 'a'] != nullptr) {
                 cur = cur->next[u - 'a'];
             } else return false;

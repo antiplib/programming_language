@@ -7,7 +7,6 @@ while
 break
 continue
 if
-main
 return
 switch
 and
