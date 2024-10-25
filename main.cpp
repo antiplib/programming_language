@@ -10,7 +10,7 @@ int main(int argc, char* argv[]) {
         s.erase(s.end() -1);
     }
     if(s[s.size() - 1] == 'a') {
-        for(int i = 0; i < 5;++i) {
+        for(int i = 0; i < 4;++i) {
             s.erase(s.end() -1);
         }
     }

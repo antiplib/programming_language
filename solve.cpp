@@ -36,7 +36,9 @@ void create_bor(Bor bor) {
 
 
     while (getline(fin, s)) {
-        s.erase(s.end() - 1);
+        if(s[s.size() - 1]=='\r')
+            s.erase(s.end() - 1);
+
         bor.add(s);
     }
     fin.close();
