@@ -11,7 +11,7 @@
 #include <map>
 #include "keywords.h"
 
-
+std::string project;
 enum TokenType {
     KEYWORD, IDENTIFIER, LITERAL, OPERATOR, PUNCTUATION, POINT, COMMA, BRACKETS, OTHER
 };
@@ -31,7 +31,7 @@ struct Token {
 };
 
 void create_bor(Bor bor) {
-    std::ifstream fin("/Users/antiplib/programming_language/keyword.txt");
+    std::ifstream fin(project + "/keyword.txt");
     std::string s;
 
 
@@ -42,7 +42,7 @@ void create_bor(Bor bor) {
     fin.close();
 }
 int  read_file() {
-    std::ifstream in("/Users/antiplib/programming_language/code.txt");
+    std::ifstream in(project + "/code.txt");
     in.seekg (0, std::ios::end);
     int size_file = in.tellg();
     in.close();
@@ -51,7 +51,12 @@ int  read_file() {
 
 void solve(){
     int size = read_file();
-    int fd = open("/Users/antiplib/programming_language/code.txt", O_RDWR);
+    std::string sss = ( project + "/code.txt");
+    char* c = new char[sss.size()];
+    for(int i = 0; i < sss.size(); ++i) {
+        c[i] = sss[i];
+    }
+    int fd = open(c, O_RDWR);
     char * buffer = (char*) malloc(size);
     read(fd, buffer, size);
 
@@ -122,7 +127,6 @@ void solve(){
                             }
                         }
                     } else if(lexeme == ";" || lexeme == "{" || lexeme == "}") {
-
                         tokens.push_back(Token(PUNCTUATION, lexeme, line));
                         --position;
                     } else if(lexeme == ".") {
