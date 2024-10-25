@@ -38,15 +38,16 @@ void create_bor(Bor bor) {
     }
     fin.close();
 }
-
-void solve(){
-   system("chcp 65001");
+int  read_file() {
     std::ifstream in("code.txt");
     in.seekg (0, std::ios::end);
-    int size = 0;
-    size = in.tellg();
+    int size_file = in.tellg();
     in.close();
-    // setlocale(LC_ALL, "ru_RU.UTF-8");
+    return size_file;
+}
+
+void solve(){
+   int size = read_file();
     int fd = open("code.txt", O_RDWR);
     char * buffer = (char*) malloc(size);
     read(fd, buffer, size);
