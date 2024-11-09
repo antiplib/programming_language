@@ -121,7 +121,7 @@ void solve(){
                             lexeme += *(buffer + position);
                             ++position;
                         }
-                        tokens.push_back(Token(COMMENT, lexeme, line));
+                        tokens.push_back(Token(LITERAL, lexeme, line));
                         if(position < size && *(buffer + position) == '"') {
                             lexeme = '"';
                         }
