@@ -13,7 +13,7 @@
 
 std::string project;
 enum TokenType {
-    KEYWORD, IDENTIFIER, LITERAL, OPERATOR, PUNCTUATION, POINT, COMMA, BRACKETS, OTHER
+    KEYWORD, IDENTIFIER, LITERAL, OPERATOR, PUNCTUATION, POINT, COMMA, BRACKETS, OTHER, COMMENT
 };
 
 struct Token {
@@ -114,7 +114,32 @@ void solve(){
                                 --position;
                             }
                         }
-                    } else if(lexeme == "(" || lexeme ==")") {
+                    }else if(lexeme[0] == '"') {
+                        tokens.push_back(Token(PUNCTUATION, lexeme, line));
+                        lexeme = "";
+                        while(position < size && *(buffer + position) != '"') {
+                            lexeme += *(buffer + position);
+                            ++position;
+                        }
+                        tokens.push_back(Token(COMMENT, lexeme, line));
+                        if(position < size && *(buffer + position) == '"') {
+                            lexeme = '"';
+                        }
+                        tokens.push_back(Token(PUNCTUATION, lexeme, line));
+
+                    }else if(lexeme == "#") {
+                        tokens.push_back(Token(PUNCTUATION, lexeme, line));
+                        lexeme = "";
+                        while(position < size && *(buffer + position) != '\n') {
+                            lexeme += *(buffer + position);
+                            ++position;
+                        }
+                        if(lexeme[lexeme.size() - 1] == '\r') {
+                            lexeme.erase(lexeme.size() - 1);
+                        }
+                        tokens.push_back(Token(COMMENT, lexeme, line));
+                    }
+                else if(lexeme == "(" || lexeme ==")") {
                         tokens.push_back(Token(BRACKETS, lexeme, line));
                         --position;
                     } else if(lexeme == ">" || lexeme == "<" || lexeme == "=" ||

@@ -3,4 +3,8 @@ int main() {
     int b;
     a%b;
     a;
+    # aaaaaaa
+    # aaaaaaaa
+    cout << "hi!";
+    c = a*b / 2.0;
 }
