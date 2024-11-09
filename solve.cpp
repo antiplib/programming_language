@@ -77,33 +77,28 @@ void solve(){
             position++;
 
         } else {
-
-
             std::string lexeme = "";
-
             while (*(buffer + position) != ' ' && isalpha(*(buffer + position))) {
                 lexeme += *(buffer + position);
                 position++;
             }
             if (keywords.check(lexeme)) {
                 tokens.push_back(Token(KEYWORD, lexeme, line));
-                std::cout <<*(buffer+ position);
             } else {
                     if(lexeme.size() != 0) {
-
-                        tokens.push_back(Token(LITERAL, lexeme, line));
+                        tokens.push_back(Token(IDENTIFIER, lexeme, line));
                         continue;
                     }
                    while (position < size && *(buffer + position) == ' ') {
                        ++position;
                    }
-                    lexeme = "";
+                    // lexeme = "";
                     if(position >= size) {
                         break;
                     }
                     lexeme += *(buffer + position);
                     ++position;
-                    if(lexeme == "-" || lexeme == "+") {
+                    if(lexeme == "-" || lexeme == "+"|| lexeme == "*" || lexeme == "/") {
                         if(position < size) {
                             if(*(buffer + position) == *(buffer + position - 1)) {
                                 lexeme += *(buffer + position);
@@ -163,10 +158,21 @@ void solve(){
                         tokens.push_back(Token(COMMA, lexeme, line));
                         --position;
                     } else if(*(buffer + position) != '\n'){
-                        while(*(buffer + position) != '\n' && position < size && (isalpha(*(buffer + position)) || *(buffer + position) -'0' >= 0 && *(buffer + position) - '0' <= 9)) {
+                        while(position < size && *(buffer + position) != '\n'  && isalpha(*(buffer + position))) {
                             lexeme += *(buffer + position);
                             ++position;
                         }
+                        if(lexeme.size() == 1 && ( lexeme[0] -'0' >= 0 && lexeme[0]- '0' <= 9)) {
+                            bool p = 0;
+                            while( position < size && ((*(buffer + position) -'0' >= 0 && *(buffer + position)- '0' <= 9) ||( *(buffer + position) == '.') && !p)) {
+                                lexeme += *(buffer + position);
+                                if(*(buffer + position) == '.') {
+                                    p = 1;
+                                }
+                                ++position;
+                            }
+                        }
+                        // if(position < size && *(buffer + position) == '')
                         tokens.push_back(Token(LITERAL, lexeme, line));
                     } else {
                         line++;
