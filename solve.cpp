@@ -162,7 +162,7 @@ void solve(){
                             lexeme += *(buffer + position);
                             ++position;
                         }
-                        if(lexeme.size() == 1 && ( lexeme[0] -'0' >= 0 && lexeme[0]- '0' <= 9)) {
+                        if(lexeme.size() != 0 && ( lexeme[0] -'0' >= 0 && lexeme[0]- '0' <= 9)) {
                             bool p = 0;
                             while( position < size && ((*(buffer + position) -'0' >= 0 && *(buffer + position)- '0' <= 9) ||( *(buffer + position) == '.') && !p)) {
                                 lexeme += *(buffer + position);
