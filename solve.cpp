@@ -82,9 +82,15 @@ void solve(){
                 lexeme += *(buffer + position);
                 position++;
             }
+            if(lexeme[lexeme.size() - 1] == '\r') {
+                lexeme.erase(lexeme.size() - 1);
+            }
             if (keywords.check(lexeme)) {
                 tokens.push_back(Token(KEYWORD, lexeme, line));
             } else {
+                if(lexeme[lexeme.size() - 1] == '\r') {
+                    lexeme.erase(lexeme.size() - 1);
+                }
                     if(lexeme.size() != 0) {
                         tokens.push_back(Token(IDENTIFIER, lexeme, line));
                         continue;
@@ -92,7 +98,7 @@ void solve(){
                    while (position < size && *(buffer + position) == ' ') {
                        ++position;
                    }
-                    // lexeme = "";
+                    lexeme = "";
                     if(position >= size) {
                         break;
                     }
@@ -153,9 +159,15 @@ void solve(){
                         --position;
                     } else if(lexeme == ".") {
                         --position;
+                        if(lexeme[lexeme.size() - 1] == '\r') {
+                            lexeme.erase(lexeme.size() - 1);
+                        }
                         tokens.push_back(Token(POINT, lexeme, line));
                     } else if(lexeme == ",") {
                         tokens.push_back(Token(COMMA, lexeme, line));
+                        if(lexeme[lexeme.size() - 1] == '\r') {
+                            lexeme.erase(lexeme.size() - 1);
+                        }
                         --position;
                     } else if(*(buffer + position) != '\n'){
                         while(position < size && *(buffer + position) != '\n'  && isalpha(*(buffer + position))) {
@@ -171,8 +183,18 @@ void solve(){
                                 }
                                 ++position;
                             }
+                            --position;
+                            if(lexeme[lexeme.size() - 1] == '\r') {
+                                lexeme.erase(lexeme.size() - 1);
+                            }
                         }
                         // if(position < size && *(buffer + position) == '')
+                        if(lexeme[lexeme.size() - 1] == '\r') {
+                            lexeme.erase(lexeme.size() - 1);
+                        }
+                        if(lexeme.size() == 0) {
+                            continue;
+                        }
                         tokens.push_back(Token(LITERAL, lexeme, line));
                     } else {
                         line++;
@@ -189,7 +211,7 @@ void solve(){
 //                tokens.push_back(Token(PUNCTUATION, s2, line));
 //            }
 
-
+            lexeme = "";
             position++;
         }
     }

@@ -6,5 +6,5 @@ int main() {
     # aaaaaaa
     # aaaaaaaa
     cout << "hi!";
-    c = a*b / 2.0;
+    c = a*b/2.0;
 }
