@@ -1,6 +1,4 @@
-//
-// Created by Владислав Отвагин on 25.10.2024.
-//
+
 #include <iostream>
 #include <fstream>
 #include <vector>
@@ -16,6 +14,7 @@ enum TokenType {
     KEYWORD, IDENTIFIER, LITERAL, OPERATOR, PUNCTUATION, POINT, COMMA, BRACKETS, OTHER, COMMENT
 };
 
+
 struct Token {
     TokenType type;
     std::string value;
@@ -29,6 +28,11 @@ struct Token {
         return os;
     }
 };
+
+
+std::vector<Token> tokens;
+Bor keywords;
+
 
 void create_bor(Bor bor) {
     std::ifstream fin(project + "/keyword.txt");
@@ -64,8 +68,7 @@ void lexer(){
     char * buffer = (char*) malloc(size);
     read(fd, buffer, size);
 
-    std::vector<Token> tokens;
-    Bor keywords;
+
     create_bor(keywords);
 
 
@@ -147,7 +150,6 @@ void lexer(){
             tokens.push_back(Token(COMMA, lexeme, line));
             continue;
         }
-
         if(lexeme == "#") {
             lexeme = "";
             ++i;
@@ -155,6 +157,10 @@ void lexer(){
                 lexeme += buffer[i];
                 ++i;
             }
+            continue;
+        }
+        if(lexeme == "[" || lexeme == "]") {
+            tokens.push_back(Token(OPERATOR, lexeme, line));
             continue;
         }
         if(lexeme[0] - '0' >= 0 && lexeme[0] - '0' < 10) {
@@ -167,11 +173,10 @@ void lexer(){
                 ++i;
             }
         }
+
         tokens.push_back(Token(OTHER, lexeme, line));
         ++i;
     }
 
-    for (const Token& token : tokens) {
-        std::cout << token << std::endl;
-    }
+
 }

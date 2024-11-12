@@ -1,7 +1,7 @@
 //
 // Created by Владислав Отвагин on 24.10.2024.
 //
-#include "solve.cpp"
+#include "Lexer.cpp"
 
 
 int main(int argc, char* argv[]) {
