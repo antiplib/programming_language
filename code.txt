@@ -1,6 +1,10 @@
 int main() {
     int a;
     int b;
-    b -= a;
-    c--;
+    a%b;
+    a;
+    # aaaaaaa
+    # aaaaaaaa
+    cout << "hi!";
+    c = a*b / 2.0;
 }
