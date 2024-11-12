@@ -72,14 +72,17 @@ void lexer(){
     int position = 0;
     int line = 1;
     for(int i = 0; i < size; ) {
-        if(buffer[i] == ' ' || buffer[i] == '\r') {
+        if(buffer[i] == ' ' ) {
             ++i;
             continue;
         }
 
-        if(buffer[i] == '\n' ) {
+        if(buffer[i] == '\n'  || buffer[i] == '\r') {
             ++i;
             ++line;
+            if(i < size && buffer[i] == '\n' || i == size && buffer[i] == '\r') {
+                ++i;
+            }
             continue;
         }
         std::string lexeme = "";
@@ -88,17 +91,20 @@ void lexer(){
             ++i;
         }
 
-        if(keywords.check(lexeme)) {
+        if (keywords.check(lexeme)) {
             tokens.push_back(Token(KEYWORD, lexeme, line));
             continue;
         }
-        if(lexeme.size() != 0) {
+        if (lexeme.size() != 0) {
             tokens.push_back(Token(IDENTIFIER, lexeme, line));
             continue;
         }
         lexeme+=buffer[i];
         ++i;
-        if(lexeme == "+" || lexeme == "-" || lexeme == "*" || lexeme == "/" || lexeme == "%" ||
+        if(lexeme.size() == 2) {
+            lexeme.erase(lexeme.end() - 1);
+        }
+        if (lexeme == "+" || lexeme == "-" || lexeme == "*" || lexeme == "/" || lexeme == "%" ||
             lexeme == "=" || lexeme == "<" || lexeme == ">" || lexeme == "!"  ) {
             if(i < size && buffer[i] == '=') {
                 lexeme += buffer[i];
@@ -122,6 +128,7 @@ void lexer(){
                 ++i;
             }
             tokens.push_back(Token(LITERAL, lexeme, line));
+            ++i;
             continue;
         }
         if(lexeme == "(" || lexeme == ")") {
@@ -149,6 +156,16 @@ void lexer(){
                 ++i;
             }
             continue;
+        }
+        if(lexeme[0] - '0' >= 0 && lexeme[0] - '0' < 10) {
+            bool p = 0;
+            while(i < size && ((buffer[i] - '0' >= 0 && buffer[i] - '0' < 10) || (buffer[i] == '.' && !p)) ) {
+                if(buffer[i] == '.') {
+                    p = 1;
+                }
+                lexeme += buffer[i];
+                ++i;
+            }
         }
         tokens.push_back(Token(OTHER, lexeme, line));
         ++i;
