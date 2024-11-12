@@ -1,7 +1,5 @@
-//
-// Created by Владислав Отвагин on 24.10.2024.
-//
-#include "Lexer.cpp"
+
+#include "syntaxer_funcs.h"
 
 
 int main(int argc, char* argv[]) {
@@ -17,5 +15,6 @@ int main(int argc, char* argv[]) {
     project = s;
 
     lexer();
+    syntax_analyzer();
     return 0;
 }

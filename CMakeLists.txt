@@ -6,6 +6,6 @@ set(CMAKE_CXX_STANDARD 17)
 add_executable(programming_language main.cpp
         keywords.h
         Lexer.cpp
-        Lexer.cpp
         syntax_analyZOV.cpp
-        syntaxer_funcs.h)
+        syntaxer_funcs.h
+        Lexer.h)

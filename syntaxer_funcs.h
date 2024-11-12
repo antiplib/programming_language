@@ -1,8 +1,9 @@
 
-#include "Lexer.cpp"
 
 #ifndef SYNTAXER_FUNCS_H
 #define SYNTAXER_FUNCS_H
+
+#include "Lexer.h"
 
 
 bool is_type(Token &t);

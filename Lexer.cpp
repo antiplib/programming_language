@@ -7,31 +7,10 @@
 #include <fcntl.h>
 
 #include <map>
-#include "keywords.h"
 
-std::string project;
-enum TokenType {
-    KEYWORD, IDENTIFIER, LITERAL, OPERATOR, PUNCTUATION, POINT, COMMA, BRACKETS, OTHER, COMMENT
-};
+#include "Lexer.h"
 
 
-struct Token {
-    TokenType type;
-    std::string value;
-    int line;
-
-    Token(TokenType type, const std::string& value, int line) :
-            type(type), value(value), line(line) {}
-
-    friend std::ostream& operator<<(std::ostream& os, const Token& token) {
-        os << "<" << token.type + 1 << ", " << token.value << ", " << token.line << ">";
-        return os;
-    }
-};
-
-
-std::vector<Token> tokens;
-Bor keywords;
 
 
 void create_bor(Bor bor) {
@@ -177,6 +156,4 @@ void lexer(){
         tokens.push_back(Token(OTHER, lexeme, line));
         ++i;
     }
-
-
 }

@@ -20,13 +20,13 @@ bool is_type_func(Token &t) {
 void up_curr_declaration() {
     ++curr;
     if(curr >= tokens.size())
-        throw("declaration_error - in line " + tokens[--curr].line);
+        throw("declaration_error - in line " + std::to_string(tokens[--curr].line));
 }
 
 void up_curr_instruction() {
     ++curr;
     if(curr >= tokens.size())
-        throw("instruction_error - in line " + tokens[--curr].line);
+        throw("instruction_error - in line " + std::to_string(tokens[--curr].line));
 }
 
 
@@ -41,12 +41,12 @@ void declaration() {
                 }
                 if(tokens[curr].type == BRACKETS && tokens[curr].value == "(") {
                     if(is_in_func) {
-                        throw("declaration_func_in_func_error in line " + tokens[curr].line);
+                        throw("declaration_func_in_func_error in line " + std::to_string(tokens[curr].line));
                     }
                     up_curr_declaration();
                     if(tokens[curr].value == ")") {
                         if(tokens[curr-1].line != tokens[curr].line) {
-                            throw("func_declaration_error_missed - ) - in line " + tokens[curr-1].line);
+                            throw("func_declaration_error_missed - ) - in line " + std::to_string(tokens[curr-1].line));
                         }
                     }
                     else {
@@ -58,16 +58,16 @@ void declaration() {
                                     up_curr_declaration();
                                     continue;
                                 } else {
-                                    throw("missing ',' between declarations in func params in line" + tokens[curr].line);
+                                    throw("missing ',' between declarations in func params in line" + std::to_string(tokens[curr].line));
                                 }
                             }
                         }
                     }
                     if(tokens[curr].value != ")")
-                        throw("missing ')' in declaration of func in line " + tokens[curr].line);
+                        throw("missing ')' in declaration of func in line " + std::to_string(tokens[curr].line));
 
                 } else {
-                    throw("declaration_error - missed ';' in line " + tokens[--curr].line);
+                    throw("declaration_error - missed ';' in line " + std::to_string(tokens[--curr].line));
                 }
                 if(tokens[curr].value == "{") {
                     up_curr_instruction();
@@ -80,7 +80,7 @@ void declaration() {
                         return;
                     }
                     else {
-                        throw("error_declaration_of_func - missed ';' in the end of line " + tokens[curr].line);
+                        throw("error_declaration_of_func - missed ';' in the end of line " + std::to_string(tokens[curr].line));
                     }
                 }
             }
@@ -104,6 +104,7 @@ void syntax_analyzer() {
 
 
     } catch(const char * c[]) {
-        std::cout << c << '\n';
+        std::cerr << c << '\n';
+        exit(1);
     }
 }
