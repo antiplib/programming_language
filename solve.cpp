@@ -173,7 +173,10 @@ void solve(){
                             }
                         }
                         // if(position < size && *(buffer + position) == '')
-                        tokens.push_back(Token(LITERAL, lexeme, line));
+                        if (lexeme != "" && lexeme != "\n") {
+                            tokens.push_back(Token(LITERAL, lexeme, line));
+                        }
+//
                     } else {
                         line++;
                     }
