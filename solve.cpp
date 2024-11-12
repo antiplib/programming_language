@@ -51,7 +51,9 @@ int  read_file() {
     return size_file;
 }
 
-void solve(){
+
+
+void lexer(){
     int size = read_file();
     std::string sss = ( project + "/code.txt");
     char* c = new char[sss.size()];
@@ -69,132 +71,87 @@ void solve(){
 
     int position = 0;
     int line = 1;
-    while (position < size) {
-        if (*(buffer + position) == '\n') {
-            line++;
+    for(int i = 0; i < size; ) {
+        if(buffer[i] == ' ' || buffer[i] == '\r') {
+            ++i;
+            continue;
         }
-        if (*(buffer + position) == ' ') {
-            position++;
 
-        } else {
-            std::string lexeme = "";
-            while (*(buffer + position) != ' ' && isalpha(*(buffer + position))) {
-                lexeme += *(buffer + position);
-                position++;
-            }
-            if (keywords.check(lexeme)) {
-                tokens.push_back(Token(KEYWORD, lexeme, line));
+        if(buffer[i] == '\n' ) {
+            ++i;
+            ++line;
+            continue;
+        }
+        std::string lexeme = "";
+        while(i < size && isalpha(buffer[i])) {
+            lexeme += buffer[i];
+            ++i;
+        }
+
+        if(keywords.check(lexeme)) {
+            tokens.push_back(Token(KEYWORD, lexeme, line));
+            continue;
+        }
+        if(lexeme.size() != 0) {
+            tokens.push_back(Token(IDENTIFIER, lexeme, line));
+            continue;
+        }
+        lexeme+=buffer[i];
+        ++i;
+        if(lexeme == "+" || lexeme == "-" || lexeme == "*" || lexeme == "/" || lexeme == "%" ||
+            lexeme == "=" || lexeme == "<" || lexeme == ">" || lexeme == "!"  ) {
+            if(i < size && buffer[i] == '=') {
+                lexeme += buffer[i];
+                tokens.push_back(Token(OPERATOR, lexeme, line));
+                ++i;
+
+            } else if((lexeme == "+" || lexeme == "-" || lexeme == ">" || lexeme == "<")&&(i < size && buffer[i] == lexeme[0])) {
+                lexeme += buffer[i];
+                tokens.push_back(Token(OPERATOR, lexeme, line));
+                ++i;
+
             } else {
-                    if(lexeme.size() != 0) {
-                        tokens.push_back(Token(IDENTIFIER, lexeme, line));
-                        continue;
-                    }
-                   while (position < size && *(buffer + position) == ' ') {
-                       ++position;
-                   }
-                    // lexeme = "";
-                    if(position >= size) {
-                        break;
-                    }
-                    lexeme += *(buffer + position);
-                    ++position;
-                    if(lexeme == "-" || lexeme == "+"|| lexeme == "*" || lexeme == "/") {
-                        if(position < size) {
-                            if(*(buffer + position) == *(buffer + position - 1)) {
-                                lexeme += *(buffer + position);
-                                tokens.push_back(Token(OPERATOR, lexeme, line));
-                            }
-                            else {
-                                tokens.push_back(Token(OPERATOR, lexeme, line));
-                                --position;
-                            }
-                        }
-                    }else if(lexeme[0] == '"') {
-                        tokens.push_back(Token(PUNCTUATION, lexeme, line));
-                        lexeme = "";
-                        while(position < size && *(buffer + position) != '"') {
-                            lexeme += *(buffer + position);
-                            ++position;
-                        }
-                        tokens.push_back(Token(LITERAL, lexeme, line));
-                        if(position < size && *(buffer + position) == '"') {
-                            lexeme = '"';
-                        }
-                        tokens.push_back(Token(PUNCTUATION, lexeme, line));
-
-                    }else if(lexeme == "#") {
-                        tokens.push_back(Token(PUNCTUATION, lexeme, line));
-                        lexeme = "";
-                        while(position < size && *(buffer + position) != '\n') {
-                            lexeme += *(buffer + position);
-                            ++position;
-                        }
-                        if(lexeme[lexeme.size() - 1] == '\r') {
-                            lexeme.erase(lexeme.size() - 1);
-                        }
-                        tokens.push_back(Token(COMMENT, lexeme, line));
-                    }
-                else if(lexeme == "(" || lexeme ==")") {
-                        tokens.push_back(Token(BRACKETS, lexeme, line));
-                        --position;
-                    } else if(lexeme == ">" || lexeme == "<" || lexeme == "=" ||
-                        lexeme == "!"|| lexeme == "%" ) {
-                        if(position < size) {
-                            if(*(buffer + position) == '=') {
-                                lexeme += *(buffer + position);
-                                tokens.push_back(Token(OPERATOR, lexeme, line));
-                            } else {
-                                tokens.push_back(Token(OPERATOR, lexeme, line));
-                                --position;
-                            }
-                        }
-                    } else if(lexeme == ";" || lexeme == "{" || lexeme == "}") {
-                        tokens.push_back(Token(PUNCTUATION, lexeme, line));
-                        --position;
-                    } else if(lexeme == ".") {
-                        --position;
-                        tokens.push_back(Token(POINT, lexeme, line));
-                    } else if(lexeme == ",") {
-                        tokens.push_back(Token(COMMA, lexeme, line));
-                        --position;
-                    } else if(*(buffer + position) != '\n'){
-                        while(position < size && *(buffer + position) != '\n'  && isalpha(*(buffer + position))) {
-                            lexeme += *(buffer + position);
-                            ++position;
-                        }
-                        if(lexeme.size() != 0 && ( lexeme[0] -'0' >= 0 && lexeme[0]- '0' <= 9)) {
-                            bool p = 0;
-                            while( position < size && ((*(buffer + position) -'0' >= 0 && *(buffer + position)- '0' <= 9) ||( *(buffer + position) == '.') && !p)) {
-                                lexeme += *(buffer + position);
-                                if(*(buffer + position) == '.') {
-                                    p = 1;
-                                }
-                                ++position;
-                            }
-                        }
-                        // if(position < size && *(buffer + position) == '')
-                        if (lexeme != "" && lexeme != "\n") {
-                            tokens.push_back(Token(LITERAL, lexeme, line));
-                        }
-//
-                    } else {
-                        line++;
-                    }
-
+                tokens.push_back(Token(OPERATOR, lexeme, line));
             }
-//            std::string s2 = "";
-//            s2 += *(buffer + position);
-//            if (*(buffer + position) != ' ' && *(buffer + position) != '\n') {
-//                tokens.push_back(Token(OTHER, s2, line));
-//            }
-//            if (*(buffer + position) == ';' || *(buffer + position) == '{' || *(buffer + position) == '}') {
-//                //std::cout << "push" << " " << s2 << " " << line << std::endl;
-//                tokens.push_back(Token(PUNCTUATION, s2, line));
-//            }
-
-
-            position++;
+            continue;
         }
+        if(lexeme[0] == '"') {
+            lexeme = "";
+            while(i < size && buffer[i] != '"') {
+                lexeme += buffer[i];
+                ++i;
+            }
+            tokens.push_back(Token(LITERAL, lexeme, line));
+            continue;
+        }
+        if(lexeme == "(" || lexeme == ")") {
+            tokens.push_back(Token(BRACKETS, lexeme, line));
+            continue;
+        }
+        if(lexeme == "{" || lexeme == "}" || lexeme == ";") {
+            tokens.push_back(Token(PUNCTUATION, lexeme, line));
+            continue;
+        }
+        if(lexeme == ".") {
+            tokens.push_back(Token(POINT, lexeme, line));
+            continue;
+        }
+        if(lexeme == ",") {
+            tokens.push_back(Token(COMMA, lexeme, line));
+            continue;
+        }
+
+        if(lexeme == "#") {
+            lexeme = "";
+            ++i;
+            while(i < size && (buffer[i] != '\n' && buffer[i] != '\r')) {
+                lexeme += buffer[i];
+                ++i;
+            }
+            continue;
+        }
+        tokens.push_back(Token(OTHER, lexeme, line));
+        ++i;
     }
 
     for (const Token& token : tokens) {

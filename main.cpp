@@ -16,6 +16,6 @@ int main(int argc, char* argv[]) {
     }
     project = s;
 
-    solve();
+    lexer();
     return 0;
 }
