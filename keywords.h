@@ -44,25 +44,22 @@ private:
     node *root = new node();
 };
 
-//enum TokenType {
-//    KEYWORD, IDENTIFIER, LITERAL, OPERATOR, PUNCTUATION, POINT, COMMA, BRACKETS, OTHER, COMMENT
-//};
-//
-//
-//struct Token {
-//    TokenType type;
-//    std::string value;
-//    int line;
-//
-//    Token(TokenType type, const std::string& value, int line) :
-//            type(type), value(value), line(line) {}
-//
-//    friend std::ostream& operator<<(std::ostream& os, const Token& token) {
-//        os << "<" << token.type + 1 << ", " << token.value << ", " << token.line << ">";
-//        return os;
-//    }
-//};
+enum TokenType {
+    KEYWORD, IDENTIFIER, LITERAL, OPERATOR, PUNCTUATION, POINT, COMMA, BRACKETS, OTHER, COMMENT
+};
 
-//std::string project;
-//std::vector<Token> tokens;
-//Bor keywords;
+
+struct Token {
+    TokenType type;
+    std::string value;
+    int line;
+
+    Token(TokenType type, const std::string& value, int line) :
+            type(type), value(value), line(line) {}
+
+    friend std::ostream& operator<<(std::ostream& os, const Token& token) {
+        os << "<" << token.type + 1 << ", " << token.value << ", " << token.line << ">";
+        return os;
+    }
+};
+
