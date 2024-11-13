@@ -54,16 +54,15 @@ void declaration() {
                         }
                     }
                     else {
-                        while(tokens[curr].value !=")") {
+                        while(tokens[curr].value != ")") {
                             declaration();
-                            up_curr_declaration();
                             if(tokens[curr].value != ")") {
                                 if(tokens[curr].type == COMMA) {
-
                                     up_curr_declaration();
                                     continue;
                                 } else {
-                                    throw("missing ',' between declarations in func params in line" + std::to_string(tokens[curr].line));
+
+                                    throw("unknown symbol spotted " + tokens[curr].value + " in line - " + std::to_string(tokens[curr].line));
                                 }
                             }
                         }
@@ -73,15 +72,17 @@ void declaration() {
                         throw("missing ')' in declaration of func in line " + std::to_string(tokens[curr].line));
                     ++curr;
 
-                } else {
+                } else if(is_in_func == 0) {
                     throw("declaration_error - missed ';' in line " + std::to_string(tokens[--curr].line));
                 }
                 if(tokens[curr].value == "{") {
+                    is_in_func = true;
                     up_curr_instruction();
                     while(tokens[curr].value != "}") {
                         declaration();
                         up_curr_instruction();
                     }
+                    is_in_func = false;
                 } else {
                     if(tokens[curr].value == ";" ) {
                         if(is_in_func) {
@@ -89,8 +90,10 @@ void declaration() {
                         }
                         return;
                     }
-                    else{
-                        throw("error_declaration_of_func - missed ';' in the end of line " + std::to_string(tokens[curr].line));
+                    else {
+                        if(!is_in_func) {
+                            throw("error_declaration_of_func - missed ';' in the end of line " + std::to_string(tokens[curr].line));
+                        }
                     }
                 }
             }
