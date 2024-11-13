@@ -16,7 +16,7 @@ public:
     void pars() {
         programma();
     }
-
+//hhfjhf
 private:
     int iter = 0;
     int count = 0;
