@@ -26,9 +26,9 @@ private:
         while (count  < lexems.size()) {
             if (lexems[count].value== "int" || lexems[count].value == "string" || lexems[count].value == "char" || lexems[count].value == "bool" || lexems[count].value == "void") {
                 ++count;
-                //id();
+                id();
                 if (lexems[count].value == "(") {
-                    //iter -= 2;
+                    iter -= 2;
                     //function();
                 } else {
 
@@ -44,6 +44,11 @@ private:
             //error;
         }
     }
+    //void
+    void error() {
+        std::cout << "error";
+    }
+
 
 
 };
