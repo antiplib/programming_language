@@ -30,7 +30,7 @@ void create_bor(Bor bor) {
     fin.close();
 }
 int  read_file() {
-    std::ifstream in(project + "/code.txt");
+    std::ifstream in(project + "/code");
     in.seekg (0, std::ios::end);
     int size_file = in.tellg();
     in.close();
@@ -41,14 +41,16 @@ int  read_file() {
 std::vector <Token> lexer() {
     int size = read_file();
     const char*c;
-    std::string q = project + "/code.txt";
+    std::string q = project + "/code";
     for(int i : q) {
         c+=i;
     }
-    int fd = open(c, O_RDWR);
+    int fd = open(c, O_RDONLY);
     char * buffer = (char*) malloc(size);
-    read(fd, buffer, size);
-
+    std::string  code = "int main(){\nint a; \n }";
+    size = code.size();
+    // read(fd, &code[0], size);
+    buffer = &code[0];
     create_bor(keywords);
 
     int position = 0;

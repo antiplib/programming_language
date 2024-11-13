@@ -8,4 +8,5 @@ add_executable(programming_language main.cpp
         Lexer.cpp
         syntax_analyZOV.cpp
         syntaxer_funcs.h
-        Lexer.h)
+        Lexer.h
+)
