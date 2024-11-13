@@ -97,7 +97,7 @@ std::vector <Token> lexer() {
             lexeme.erase(lexeme.end() - 1);
         }
         if (lexeme == "+" || lexeme == "-" || lexeme == "*" || lexeme == "/" || lexeme == "%" ||
-            lexeme == "=" || lexeme == "<" || lexeme == ">" || lexeme == "!"  ) {
+            lexeme == "=" || lexeme == "<" || lexeme == ">" || lexeme == "!" || lexeme == "&" ) {
             if(i < size && buffer[i] == '=') {
                 lexeme += buffer[i];
                 tokens.push_back(Token(OPERATOR, lexeme, line));

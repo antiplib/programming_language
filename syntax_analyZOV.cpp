@@ -68,6 +68,7 @@ void declaration() {
                     }
                     if(tokens[curr].value != ")")
                         throw("missing ')' in declaration of func in line " + std::to_string(tokens[curr].line));
+                    ++curr;
 
                 } else {
                     throw("declaration_error - missed ';' in line " + std::to_string(tokens[--curr].line));
@@ -102,12 +103,13 @@ void syntax_analyzer() {
 
         while(curr < tokens.size()) {
             declaration();
+            ++curr;
         }
-
 
 
     } catch(std::string c) {
         std::cerr << c << '\n';
         exit(1);
     }
+    std::cout << "beautiful code, bro";
 }
