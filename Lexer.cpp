@@ -163,7 +163,6 @@ std::vector <Token> lexer() {
             }
         }
         tokens.push_back(Token(OTHER, lexeme, line));
-        ++i;
     }
     for (auto i : tokens)  {
         std::cout << i << std::endl;
