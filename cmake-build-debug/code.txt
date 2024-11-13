@@ -1,0 +1,15 @@
+int main() {
+    int a;
+
+    int b;
+
+
+    b -= a;
+
+    c--;
+
+    #aaaaaaa
+    #aaaaaaaa
+    cout << "hi!";
+    c = a*b / 2.0;
+}

@@ -1,20 +1,54 @@
 
 #include "syntaxer_funcs.h"
+#include "Lexer.h"
 
+#include <iostream>
+#include <fstream>
+#include <vector>
 
-int main(int argc, char* argv[]) {
-    std::string s = *argv;
-    for(int i = 0; i < 18+21; ++i) {
-        s.erase(s.end() -1);
+#include <fcntl.h>
+#include <map>
+
+class  Parser {
+public:
+    Parser(std::vector<Token> tokens) :  iter(0) {}
+
+    void pars() {
+        programma();
     }
-    if(s[s.size() - 1] == 'a') {
-        for(int i = 0; i < 4;++i) {
-            s.erase(s.end() -1);
+
+private:
+    int iter = 0;
+    int count = 0;
+    std::vector<Token> lexems;
+    void programma() {
+        while (count  < lexems.size()) {
+            if (lexems[count].value== "int" || lexems[count].value == "string" || lexems[count].value == "char" || lexems[count].value == "bool" || lexems[count].value == "void") {
+                ++count;
+                //id();
+                if (lexems[count].value == "(") {
+                    //iter -= 2;
+                    //function();
+                } else {
+
+                }
+
+            }
         }
     }
-    project = s;
+    void id() {
+        if (lexems[count].type == 2) {
+            count++;
+        } else {
+            //error;
+        }
+    }
 
-    lexer();
-    syntax_analyzer();
-    return 0;
+
+};
+
+
+int main() {
+    Parser parser(lexer());
+
 }
