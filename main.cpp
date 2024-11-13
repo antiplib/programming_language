@@ -69,5 +69,6 @@ void get_filename(int argc, char* argv[]) {
 int main(int argc, char* argv[]) {
     get_filename(argc, argv);
     lexer();
+    syntax_analyzer();
 
 }

@@ -106,7 +106,7 @@ void syntax_analyzer() {
 
 
 
-    } catch(const char * c) {
+    } catch(std::string c) {
         std::cerr << c << '\n';
         exit(1);
     }

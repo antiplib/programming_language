@@ -30,27 +30,34 @@ void create_bor(Bor bor) {
     fin.close();
 }
 int  read_file() {
-    std::ifstream in(project + "/code");
-    in.seekg (0, std::ios::end);
-    int size_file = in.tellg();
-    in.close();
-    return size_file;
+    std::ifstream file(project + "/code.txt", std::ios::binary);
+    file.seekg(0, std::ios::end);
+    std::streamsize size = file.tellg();
+    file.seekg(0, std::ios::beg);
+    char* buffer = new char[size + 1];
+    file.read(buffer, size);
+    buffer[size] = '\0';
+    file.close();
+
 }
 
 
 std::vector <Token> lexer() {
-    int size = read_file();
+    // int size = read_file();
     const char*c;
-    std::string q = project + "/code";
+    std::string q = project + "/code.txt";
     for(int i : q) {
         c+=i;
     }
-    int fd = open(c, O_RDONLY);
-    char * buffer = (char*) malloc(size);
-    std::string  code = "int main(){\nint a; \n }";
-    size = code.size();
-    // read(fd, &code[0], size);
-    buffer = &code[0];
+    std::ifstream file(project + "/code.txt", std::ios::binary);
+    file.seekg(0, std::ios::end);
+    std::streamsize size = file.tellg();
+    file.seekg(0, std::ios::beg);
+    char* buffer = new char[size + 1];
+    file.read(buffer, size);
+    buffer[size] = '\0';
+    file.close();
+
     create_bor(keywords);
 
     int position = 0;
