@@ -525,7 +525,6 @@ void get_filename(int argc, char* argv[]) {
     }
     project = std::string(s);
 }
-//
 
 int main(int argc, char* argv[]) {
     get_filename(argc, argv);
