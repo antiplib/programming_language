@@ -61,8 +61,7 @@ void declaration() {
                                     up_curr_declaration();
                                     continue;
                                 } else {
-
-                                    throw("unknown symbol spotted " + tokens[curr].value + " in line - " + std::to_string(tokens[curr].line));
+                                    throw("unknown symbol spotted: '" + tokens[curr].value  +"'"+ " in line - " + std::to_string(tokens[curr].line));
                                 }
                             }
                         }
@@ -84,7 +83,7 @@ void declaration() {
                     }
                     is_in_func = false;
                 } else {
-                    if(tokens[curr].value == ";" ) {
+                    if(tokens[curr].value == ";") {
                         if(is_in_func) {
                             throw("error_declaration_of_func - excess ';' it line  " + std::to_string(tokens[curr].line));
                         }

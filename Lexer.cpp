@@ -162,7 +162,7 @@ std::vector <Token> lexer() {
                 ++i;
             }
         }
-        tokens.push_back(Token(OTHER, lexeme, line));
+        tokens.push_back(Token(LITERAL, lexeme, line));
     }
     for (auto i : tokens)  {
         std::cout << i << std::endl;
