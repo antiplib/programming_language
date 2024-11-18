@@ -1,8 +1,17 @@
-int a;
-int main(int a, int b){
-     int a;
-}
+int main (){
+    while (c != d) {
+        a = c + b;
 
-int b(){
+        b = g + h;
+    }
+}
+int a() {
+    while ( a > b) {
+        d = c + v;
+    }
+    for (int i =d  ;i < n; i += d) {
+        a = b + f(c + 4);
+    }
+
 
 }

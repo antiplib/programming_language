@@ -4,11 +4,13 @@
  std::vector<Token> tokens;
  std::string project;
  Bor keywords;
+
 int curr = 0;
+
 bool is_in_func = 0;
 bool is_type(Token &t) {
-    if(t.value == "int" || t.value == "float" || t.value == "double" ||
-        t.value == "char" || t.value == "string" || t.value == "bool")
+    if(t.value == "int" || t.value == "float" || t.value == "double"
+         || t.value == "string")
         return true;
     return false;
 }
@@ -43,9 +45,9 @@ void declaration() {
                     return;
                 }
                 if( tokens[curr].value == "(") {
-                    if(is_in_func) {
-                        throw("declaration_func_in_func_error in line " + std::to_string(tokens[curr].line));
-                    }
+//                    if(is_in_func) {
+//                        throw("declaration_func_in_func_error in line " + std::to_string(tokens[curr].line));
+//                    }
                     is_in_func = true;
                     up_curr_declaration();
                     if(tokens[curr].value == ")") {
@@ -55,7 +57,7 @@ void declaration() {
                     }
                     else {
                         while(tokens[curr].value != ")") {
-                            declaration();
+                            //declaration();
                             if(tokens[curr].value != ")") {
                                 if(tokens[curr].type == COMMA) {
                                     up_curr_declaration();
@@ -105,6 +107,130 @@ void instruction() {
 
     }
 }
+
+
+//void expression() {
+//    level_11();
+//}
+//void level_11() {
+//    level_10();
+//    while (curr < tokens.size()) {
+//        if (tokens[curr].value == ",") {
+//            ++curr;
+//            level_10();
+//        } else {
+//            break;
+//        }
+//    }
+//}
+//void level_10(){
+//    level_9();
+//    while (curr < tokens.size()) {
+//        if (tokens[curr].value == "=" || tokens[curr].value== "+=" || tokens[curr].value == "-=") {
+//            ++curr;
+//            level_9();
+//        } else {
+//            break;
+//        }
+//    }
+//};
+//void level_9() {
+//    level_8();
+//    while (curr < tokens.size()) {
+//        if (tokens[curr].value == "||") {
+//            ++curr;
+//            level_8();
+//        } else {
+//            break;
+//        }
+//    }
+//}
+//void level_8() {
+//    level_7();
+//    while (curr < tokens.size()) {
+//        if (tokens[curr].value == "&&") {
+//            ++curr;
+//            level_7();
+//        } else {
+//            break;
+//        }
+//    }
+//}
+//void level_7() {
+//    level_6();
+//    while (curr < tokens.size()) {
+//        if (tokens[curr].value == "|") {
+//            ++curr;
+//            level_6();
+//        } else {
+//            break;
+//        }
+//    }
+//}
+//void level_6() {
+//    level_5();
+//    while (curr < tokens.size()) {
+//        if (tokens[curr].value == "&") {
+//            ++curr;
+//            level_5();
+//        } else {
+//            break;
+//        }
+//    }
+//}
+//void level_5() {
+//    level_4();
+//    while (curr < tokens.size()) {
+//        if (tokens[curr].value == "<=" || tokens[curr].value == ">=" || tokens[curr].value == "==" || tokens[curr].value == ">" || tokens[curr].value == "<" || tokens[curr].value== "!=") {
+//            ++curr;
+//            level_4();
+//        } else {
+//            break;
+//        }
+//    }
+//}
+//void level_4() {
+//    level_3()
+//    while (curr < tokens.size()) {
+//        if (tokens[curr].value == "+" || tokens[curr].value == "-") {
+//            ++curr;
+//            level_3();
+//        } else {
+//            break;
+//        }
+//    }
+//}
+//void level_3() {
+//    level_2()
+//    while (curr < tokens.size()) {
+//        if (tokens[curr].value == "*" || tokens[curr].value == "/") {
+//            ++curr;
+//            level_2();
+//        } else {
+//            break;
+//        }
+//    }
+//}
+//void level_2() {
+//    level_1()
+//    while (curr < tokens.size()) {
+//        if (tokens[curr].value == "++" || tokens[curr].value == "--") {
+//            ++curr;
+//            level_1();
+//        } else {
+//            break;
+//        }
+//    }
+//}
+//
+
+
+
+
+
+
+
+
 
 void syntax_analyzer() {
     try {
