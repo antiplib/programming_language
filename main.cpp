@@ -83,20 +83,34 @@ private:
             declaration_id();
         }
     }
+    void declaration_many_parametr() {
+        declaration_parametr();
+        while(tokens[curr].value == ",") {
+            ++curr;
+            declaration_parametr();
+        }
+    }
+    void declaration_parametr() {
+        //std::cout << "checkkkk" << tokens[curr].value << std::endl;
+        if (tokens[curr].value == "int" || tokens[curr].value == "string" || tokens[curr].value == "double") {
+            curr++;
+        } else {
+            throw("error - miss int or double or string  it line  " + std::to_string(tokens[curr].line));
+        }
+        if (tokens[curr].type == IDENTIFIER) {
+            curr++;
+        } else {
+            throw("error - miss IDENTIFIER it line  " + std::to_string(tokens[curr].line));
+        }
+    }
     void list_instructions() {
         instruction();
     }
     void function() {
         while (tokens[curr].value != ")") {
-           // declaration_many_id();
-            declaration_id();
-            //std::cout << "CHECK" << " " << tokens[curr].value;
-            if (tokens[curr].value == ",") {
-                curr++;
-                declaration_id();
-            } else if (tokens[curr].value != ")" ) {
-                throw("error - miss , it line  " + std::to_string(tokens[curr].line));
-            }
+            //std::cout << "check" << tokens[curr].value << std::endl;
+            declaration_many_parametr();
+
 
         }
         curr++;

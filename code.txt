@@ -1,9 +1,5 @@
-int main () {
-    while (c != a) {
-        a = c + b;
-        b = g + h;
+int main( int c) {
+    while (c!= d) {
+
     }
-}
-int a( string c) {
-    c = 4;
 }
