@@ -31,6 +31,8 @@ private:
         if (tokens[curr].type == IDENTIFIER) {
             ++curr;
             //std::cout <<
+        } else {
+            throw("error - miss IDENTIFIER it line  " + std::to_string(tokens[curr].line));
         }
         if (tokens[curr].value == "=") {
             ++curr;
@@ -86,13 +88,16 @@ private:
     }
     void function() {
         while (tokens[curr].value != ")") {
+           // declaration_many_id();
             declaration_id();
-            curr++;
+            //std::cout << "CHECK" << " " << tokens[curr].value;
             if (tokens[curr].value == ",") {
                 curr++;
-            } else {
+                declaration_id();
+            } else if (tokens[curr].value != ")" ) {
                 throw("error - miss , it line  " + std::to_string(tokens[curr].line));
             }
+
         }
         curr++;
 
@@ -525,6 +530,7 @@ void get_filename(int argc, char* argv[]) {
     }
     project = std::string(s);
 }
+//
 
 int main(int argc, char* argv[]) {
     get_filename(argc, argv);

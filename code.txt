@@ -1,17 +1,9 @@
-int main (){
-    while (c != d) {
+int main () {
+    while (c != a) {
         a = c + b;
-
         b = g + h;
     }
 }
-int a() {
-    while ( a > b) {
-        d = c + v;
-    }
-    for (int i =d  ;i < n; i += d) {
-        a = b + f(c + 4);
-    }
-
-
+int a( string c) {
+    c = 4;
 }
