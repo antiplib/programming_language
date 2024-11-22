@@ -1,9 +1,12 @@
-#include "syntaxer_funcs.h"
 #include <string>
 
 #include <iostream>
 #include <vector>
+#include "sem_analyzer.h"
 
+extern std::vector<Token> tokens;
+extern std::string project;
+extern Bor keywords;
 
 class  Parser {
 public:
@@ -524,10 +527,11 @@ private:
             std::cerr << c << '\n';
             exit(1);
         }
-        std::cout << "------------------------" << std::endl;
-        std::cout << "beautiful code, bro";
-    }
 
+        std::cout <<  "------------------------" << std::endl;
+        std::cout << "beautiful code\n";
+        std::cout <<  "------------------------" << std::endl;
+    }
 
 
 };
@@ -542,13 +546,19 @@ void get_filename(int argc, char* argv[]) {
             s.erase(s.end() -1);
         }
     }
-    project = std::string(s);
+     project = std::string(s);
 }
 //
 
 int main(int argc, char* argv[]) {
     get_filename(argc, argv);
     Parser parser(lexer());
+    for (auto i : tokens)  {
+        std::cout << i << std::endl;
+    }
     parser.pars();
-
+    tokens.clear();
+    std::cout <<  "------------------------" << std::endl;
+    sem_analyzer a(lexer());
+    std::cout <<  "------------------------" << std::endl;
 }

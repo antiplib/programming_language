@@ -1,5 +1,6 @@
-int main( int c) {
-    while (c!= d) {
 
-    }
+int main(){
+    int a;
+    int m;
+    int q;
 }

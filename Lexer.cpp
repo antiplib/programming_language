@@ -8,15 +8,14 @@
 
 #include <map>
 
-#include "Lexer.h"
+#include "head.h"
 
-extern std::vector<Token> tokens;
-extern std::string project;
-extern Bor keywords;
+ std::vector<Token> tokens;
+ std::string project;
+ Bor keywords;
 
 
-
-void create_bor(Bor bor) {
+extern void create_bor(Bor bor) {
     std::ifstream fin(project + "/keyword.txt");
     std::string s;
 
@@ -29,7 +28,7 @@ void create_bor(Bor bor) {
     }
     fin.close();
 }
-int  read_file() {
+extern int  read_file() {
     std::ifstream file(project + "/code.txt", std::ios::binary);
     file.seekg(0, std::ios::end);
     std::streamsize size = file.tellg();
@@ -42,7 +41,7 @@ int  read_file() {
 }
 
 
-std::vector <Token> lexer() {
+ std::vector <Token> lexer() {
     // int size = read_file();
     const char*c;
     std::string q = project + "/code.txt";
@@ -164,8 +163,6 @@ std::vector <Token> lexer() {
         }
         tokens.push_back(Token(LITERAL, lexeme, line));
     }
-    for (auto i : tokens)  {
-        std::cout << i << std::endl;
-    }
+
     return tokens;
 }
