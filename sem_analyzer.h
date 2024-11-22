@@ -173,6 +173,9 @@ public:
                         }
                         --curr;
                     }
+                    else if(tokens[curr].type == IDENTIFIER) {
+                        type_tree.ask(curr_func, tokens[curr].value, tokens[curr].line);
+                    }
                     ++curr;
                 }
             }

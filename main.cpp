@@ -527,7 +527,6 @@ private:
             std::cerr << c << '\n';
             exit(1);
         }
-
         std::cout <<  "------------------------" << std::endl;
         std::cout << "beautiful code\n";
         std::cout <<  "------------------------" << std::endl;
@@ -558,7 +557,6 @@ int main(int argc, char* argv[]) {
     }
     parser.pars();
     tokens.clear();
-    std::cout <<  "------------------------" << std::endl;
     sem_analyzer a(lexer());
     std::cout <<  "------------------------" << std::endl;
 }

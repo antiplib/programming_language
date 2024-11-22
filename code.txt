@@ -1,6 +1,8 @@
-
+int a(){
+int a;
+}
 int main(){
-    int a;
-    int m;
-    int q;
+    string mi;
+    string m;
+    mi+=m;
 }
