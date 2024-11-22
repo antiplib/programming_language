@@ -1,8 +1,5 @@
-int a(){
-int a;
-}
-int main(){
-    string mi;
-    string m;
-    mi+=m;
+int main( int c) {
+    int a;
+    int b;
+    double m;
 }

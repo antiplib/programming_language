@@ -340,7 +340,7 @@ private:
 
     void instruction() {
         //std::cout << "istruction " << " " << tokens[curr].value << std::endl;
-        if (tokens[curr].value == "int" || tokens[curr].value == "string" || tokens[curr].value== "bool") {
+        if (tokens[curr].value == "int" || tokens[curr].value == "string" || tokens[curr].value== "bool" || tokens[curr].value == "double") {
             declaration_many_id();
             //std::cout << "here3" << std::endl;
             check_semicolon();
@@ -488,7 +488,7 @@ private:
         if (tokens[curr].value == "++" || tokens[curr].value == "--") {
             ++curr;
         }
-       // std::cout << "here7" << " " << tokens[curr].value << std::endl;
+        // std::cout << "here7" << " " << tokens[curr].value << std::endl;
         if (tokens[curr].type == LITERAL || tokens[curr].type == IDENTIFIER) {
             //std::cout << "here6" << " " << tokens[curr].value << std::endl;
             level_1();
@@ -522,7 +522,7 @@ private:
     }
     void programma() {
         try {
-                declaration();
+            declaration();
         } catch(std::string c) {
             std::cerr << c << '\n';
             exit(1);
@@ -545,7 +545,7 @@ void get_filename(int argc, char* argv[]) {
             s.erase(s.end() -1);
         }
     }
-     project = std::string(s);
+    project = std::string(s);
 }
 //
 
@@ -557,6 +557,6 @@ int main(int argc, char* argv[]) {
     }
     parser.pars();
     tokens.clear();
-    sem_analyzer a(lexer());
+   sem_analyzer a(lexer());
     std::cout <<  "------------------------" << std::endl;
 }
