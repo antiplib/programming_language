@@ -1,8 +1,9 @@
 #include <string>
-
+#include <stack>
 #include <iostream>
 #include <vector>
 #include "sem_analyzer.h"
+#include <cctype>
 
 extern std::vector<Token> tokens;
 extern std::string project;
@@ -17,6 +18,7 @@ public:
     }
 private:
     int curr = 0;
+    bool flag_for_comma = 1;
     std::vector<Token> tokens;
     void check_semicolon() {
         if (tokens[curr].value == ";") {
@@ -31,6 +33,7 @@ private:
         if (tokens[curr].value == "int" || tokens[curr].value == "string" || tokens[curr].value == "double") {
             ++curr;
         }
+
         if (tokens[curr].type == IDENTIFIER) {
             ++curr;
             //std::cout <<
@@ -39,7 +42,9 @@ private:
         }
         if (tokens[curr].value == "=") {
             ++curr;
+            flag_for_comma = 0;
             expression();
+            flag_for_comma = 1;
         }  else if (tokens[curr].value == "[") {
             ++curr;
             expression();
@@ -134,16 +139,32 @@ private:
             //std::cout << "curr" << curr;
             if (tokens[curr].value == "void" || tokens[curr].value == "int" || tokens[curr].value == "string" || tokens[curr].value == "double") {
                 curr++;
+                bool f = 0;
+                if (tokens[curr].value == "[") {
+                    f = 1;
+                    curr++;
+
+                }
+                //std::cout << "hjdjhdj " << tokens[curr].value;
+                if (tokens[curr].value == "]") {
+                    curr++;
+                } else if (tokens[curr].value != "]" && f == 1) {
+                    throw("error - miss ] it line  " + std::to_string(tokens[curr].line));
+                }
                 if (tokens[curr].type == IDENTIFIER) {
                     curr++;
                 } else {
                     throw("error - miss identifier it line  " + std::to_string(tokens[curr].line));
                 }
+                //std::cout << "aaaa" << tokens[curr - 2].value << std::endl;
                 if (tokens[curr].value == "(") {
                     curr++;
                     //std::cout << "here" << std::endl;
                     function();
                 } else  {
+                    if (tokens[curr - 2].value == "void") {
+                        throw("error - miss ( it line  " + std::to_string(tokens[curr - 1].line));
+                    }
                     curr -= 1;
                     declaration_many_id();
                     check_semicolon();
@@ -171,16 +192,21 @@ private:
         } else {
             throw("error - miss ( it line  " + std::to_string(tokens[curr].line));
         }
+        flag_for_comma = 0;
         expression();
+        flag_for_comma = 1;
         while (tokens[curr].value == ",") {
             ++curr;
+            flag_for_comma = 0;
             expression();
+            flag_for_comma = 1;
         }
         if (tokens[curr].value == ")") {
             ++curr;
         } else {
             throw("error - miss ) it line  " + std::to_string(tokens[curr].line));
         }
+        //st.push_sem_stack_type(тип функции)
 
     }
 
@@ -200,6 +226,7 @@ private:
             throw("error - miss ( it line  " + std::to_string(tokens[curr].line));
         };
         expression();
+        check_bool();
         if (tokens[curr++].value != ")") {
             throw("error - miss ) it line  " + std::to_string(tokens[curr - 2].line));
         }
@@ -224,6 +251,7 @@ private:
             throw("error - miss ( it line  " + std::to_string(tokens[curr - 2].line));
         };
         expression();
+        check_bool();
         if (tokens[curr++].value != ")") {
             throw("error - miss ) it line  " + std::to_string(tokens[curr - 2].line));
         };
@@ -248,6 +276,7 @@ private:
             throw("error - miss ( it line  " + std::to_string(tokens[curr].line));
         }
         expression();
+        check_bool();
         if (tokens[curr++].value != ")") {
             throw("error - miss ) it line  " + std::to_string(tokens[curr - 2].line));
         }
@@ -317,6 +346,7 @@ private:
         }
         if (tokens[curr].value != ";") {
             expression();
+            check_bool();
             check_semicolon();
         } else {
             curr++;
@@ -374,8 +404,6 @@ private:
                 //std::cout << "ree";
                 expression();
                 check_semicolon();
-
-
             }
         }
         instruction();
@@ -385,12 +413,15 @@ private:
     }
     void level_11() {
         level_10();
-        while (curr < tokens.size()) {
-            if (tokens[curr].value == ",") {
-                ++curr;
-                level_10();
-            } else {
-                break;
+        if (flag_for_comma) {
+            while (curr < tokens.size()) {
+                if (tokens[curr].value == ",") {
+                    st.push_sem_stack_lex(tokens[curr].value);
+                    ++curr;
+                    level_10();
+                } else {
+                    break;
+                }
             }
         }
     }
@@ -398,8 +429,10 @@ private:
         level_9();
         while (curr < tokens.size()) {
             if (tokens[curr].value == "=" || tokens[curr].value== "+=" || tokens[curr].value == "-=") {
+                st.push_sem_stack_lex(tokens[curr].value);
                 ++curr;
                 level_9();
+                check_bin();
             } else {
                 break;
             }
@@ -409,8 +442,10 @@ private:
         level_8();
         while (curr < tokens.size()) {
             if (tokens[curr].value == "||") {
+                st.push_sem_stack_lex(tokens[curr].value);
                 ++curr;
                 level_8();
+                check_bin();
             } else {
                 break;
             }
@@ -420,8 +455,10 @@ private:
         level_7();
         while (curr < tokens.size()) {
             if (tokens[curr].value == "&&") {
+                st.push_sem_stack_lex(tokens[curr].value);
                 ++curr;
                 level_7();
+                check_bin();
             } else {
                 break;
             }
@@ -431,8 +468,10 @@ private:
         level_6();
         while (curr < tokens.size()) {
             if (tokens[curr].value == "|") {
+                st.push_sem_stack_lex(tokens[curr].value);
                 ++curr;
                 level_6();
+                check_bin();
             } else {
                 break;
             }
@@ -442,8 +481,10 @@ private:
         level_5();
         while (curr < tokens.size()) {
             if (tokens[curr].value == "&") {
+                st.push_sem_stack_lex(tokens[curr].value);
                 ++curr;
                 level_5();
+                check_bin();
             } else {
                 break;
             }
@@ -453,8 +494,10 @@ private:
         level_4();
         while (curr < tokens.size()) {
             if (tokens[curr].value == "<=" || tokens[curr].value == ">=" || tokens[curr].value == "==" || tokens[curr].value == ">" || tokens[curr].value == "<" || tokens[curr].value== "!=") {
+                st.push_sem_stack_lex(tokens[curr].value);
                 ++curr;
                 level_4();
+                check_bin();
             } else {
                 break;
             }
@@ -464,8 +507,10 @@ private:
         level_3();
         while (curr < tokens.size()) {
             if (tokens[curr].value == "+" || tokens[curr].value == "-") {
+                st.push_sem_stack_lex(tokens[curr].value);
                 ++curr;
                 level_3();
+                check_bin();
             } else {
                 break;
             }
@@ -475,8 +520,10 @@ private:
         level_2();
         while (curr < tokens.size()) {
             if (tokens[curr].value == "*" || tokens[curr].value == "/") {
+                st.push_sem_stack_lex(tokens[curr].value);
                 ++curr;
                 level_2();
+                check_bin();
             } else {
                 break;
             }
@@ -486,7 +533,9 @@ private:
         //level_1();
         //std::cout << "here5" << " " << tokens[curr].value << std::endl;
         if (tokens[curr].value == "++" || tokens[curr].value == "--") {
+            st.push_sem_stack_lex(tokens[curr].value);
             ++curr;
+            check_uno();
         }
         // std::cout << "here7" << " " << tokens[curr].value << std::endl;
         if (tokens[curr].type == LITERAL || tokens[curr].type == IDENTIFIER) {
@@ -509,11 +558,32 @@ private:
     void level_1() {
         //std::cout << "here6" << " " << tokens[curr].value << std::endl;
         if (tokens[curr].type == LITERAL) {
+            bool fl_chislo = 1;
+            bool fl_float = 0;
+            for (int i = 0; i < tokens[curr].value.size(); ++i ) {
+                if (!(tokens[curr].value[i] >= '0' && tokens[curr].value[i] <= '9')  && tokens[curr].value[i] != '.') {
+                    fl_chislo = 0;
+                }
+                if (tokens[curr].value[i] == '.') {
+                    fl_float = 1;
+                }
+            }
+            if (!fl_chislo) {
+                st.push_sem_stack_type("string");
+            } else {
+                if (fl_float) {
+                    st.push_sem_stack_type("float");
+                } else {
+                    st.push_sem_stack_type("int");
+                }
+            }
             ++curr;
         } else if (tokens[curr].type == IDENTIFIER) {
             if (tokens[curr + 1].value == "(") {
                 call_function();
             } else {
+                // проверка переменной
+                //st.push_sem_stack_type(тип переменной);
                 ++curr;
             }
         } else {
@@ -531,7 +601,79 @@ private:
         std::cout << "beautiful code\n";
         std::cout <<  "------------------------" << std::endl;
     }
+    struct sem_stack {
+        std::stack <std::string> types;
+        std::stack <std::string> operations;
+        void stack_clear() {
+            while (types.empty()) {
+                types.pop();
+            }
+            while (operations.empty()) {
+                operations.pop();
+            }
+        }
+        void push_sem_stack_lex(std::string lex) {
+            types.push(lex);
+        }
+        void push_sem_stack_type(std::string type) {
+            operations.push(type);
+        }
+    };
 
+    void check_bin() {
+        std::string type_l = st.types.top();
+        st.types.pop();
+        std::string type_r = st.types.top();
+        st.types.pop();
+        std::string operation = st.operations.top();
+        st.operations.pop();
+        if (operation == ",") {
+            st.types.push(type_l);
+        }
+        if (type_l == "int" && type_r == "int") {
+                st.types.push("int");
+        } else if ((type_l == "float" || type_l == "int") && (type_r == "float" || type_r == "int") ){
+                st.types.push("float");
+        } else if (type_l == "bool"  && type_r == "bool") {
+                st.types.push("bool");
+        } else if((type_l == "bool" || type_l == "int")  && (type_r == "bool" || type_r == "int")) {
+                st.types.push("bool");
+        } else if (type_l == "string" && type_r == "string") {
+            if (operation == "==" || operation == "!=" || operation == "=") {
+                st.types.push("string");
+            } else {
+                throw("error - operation not correct ");
+            }
+        } else {
+            throw("error - types are not correct ");
+        }
+    }
+    void check_uno() {
+        std::string type = st.types.top();
+        st.types.pop();
+        std::string operation = st.operations.top();
+        st.operations.pop();
+        if (type != "int" &&  type != "float" && type != "bool") {
+            if (operation == "*" || operation == "&") {
+                st.types.push(type);
+            } else {
+                throw(" error - type is not correct with operation");
+            }
+        } else {
+            if ((type == "bool" || type == "float")  && (operation == "++" || operation == "--")) {
+                throw(" error - operation is not correct with bool or  float");
+            }
+            st.types.push(type);
+        }
+    }
+    bool check_bool() {
+        std::string type = st.types.top();
+        if (type != "bool" && type != "int") {
+            throw(" error - type is not bool or int ");
+        }
+        return true;
+    }
+    sem_stack st;
 
 };
 
@@ -557,6 +699,6 @@ int main(int argc, char* argv[]) {
     }
     parser.pars();
     tokens.clear();
-   sem_analyzer a(lexer());
+    //sem_analyzer a(lexer());
     std::cout <<  "------------------------" << std::endl;
 }

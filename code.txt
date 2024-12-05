@@ -1,4 +1,7 @@
-int main( int c) {
+int b(int c) {
+    c++ ;
+};
+void  main( int c) {
     int a;
     int b;
     double m;

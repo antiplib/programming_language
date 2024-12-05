@@ -18,10 +18,10 @@ extern std::string project;
 extern Bor keywords;
 
 struct variable{
-  variable(std::string a, std::string b){
+    variable(std::string a, std::string b){
         name = a;
         type = b;
-  }
+    }
     std::string name;
     std::string type;
     bool rval = 0;
@@ -29,15 +29,15 @@ struct variable{
 
 bool is_tp(std::string s) {
     if(s == "int" || s == "char" || s == "string" || s == "bool" ||
-        s == "float" || s == "double" ) {
+       s == "float" || s == "double" ) {
         return true;
     }
     return false;
 }
 bool is_func_tp(std::string s) {
     if(s == "int" || s == "char" || s == "string" ||
-        s == "bool" || s == "float" || s == "double" ||
-        s == "void" ) {
+       s == "bool" || s == "float" || s == "double" ||
+       s == "void" ) {
         return true;
     }
     return false;
@@ -48,11 +48,11 @@ public:
     type_tree(){};
 
     void add_global(std::string name, std::string type, int line){
-         for(auto e : mp["global"]){
-             if(e.name == name){
-               throw ("multiply definition in line " + std::to_string(line) + " is not allowed");
-             }
-         }
+        for(auto e : mp["global"]){
+            if(e.name == name){
+                throw ("multiply definition in line " + std::to_string(line) + " is not allowed");
+            }
+        }
         mp["global"].push_back(variable(name, type));
     }
     void add_local(std::string name, std::string type, std::string func, int line){
@@ -61,19 +61,19 @@ public:
                 throw ("multiply definition in line " + std::to_string(line) + " is not allowed");
             }
         }
-      mp[func].push_back(variable(name, type));
+        mp[func].push_back(variable(name, type));
     }
 
     void add_func(std::string name, std::string type, int line){
-          if(mp.find(name) != mp.end()) {
-              if(is_defined[name] != 0) {
-                  throw("redifinition of_function " + name + " in line " + std::to_string(line));
-              }
+        if(mp.find(name) != mp.end()) {
+            if(is_defined[name] != 0) {
+                throw("redifinition of_function " + name + " in line " + std::to_string(line));
+            }
 
-              if(type_of_func[name] != type) {
-                  throw("function " + name + " has also another type in line " + std::to_string(line));
-              }
-          }
+            if(type_of_func[name] != type) {
+                throw("function " + name + " has also another type in line " + std::to_string(line));
+            }
+        }
         mp[name] = {};
         is_defined[name] = 1;
         type_of_func[name] = type;
@@ -103,9 +103,9 @@ public:
     }
 
 private:
-     std::map<std::string, std::vector <variable>> mp;
-     std::map <std::string, std::string> type_of_func;
-     std::map<std::string, bool> is_defined;
+    std::map<std::string, std::vector <variable>> mp;
+    std::map <std::string, std::string> type_of_func;
+    std::map<std::string, bool> is_defined;
 };
 
 class sem_analyzer {
@@ -132,8 +132,8 @@ public:
                         break;
                     }
                     if(tokens[helper].type == OPERATOR ||
-                        tokens[helper].type == PUNCTUATION ||
-                        tokens[helper].type == COMMA) {
+                       tokens[helper].type == PUNCTUATION ||
+                       tokens[helper].type == COMMA) {
                         break;
                     }
                     helper++;
