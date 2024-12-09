@@ -1,5 +1,5 @@
 int b(int c) {
-    c++ ;
+    c++;
 };
 void  main( int c) {
     int a;
