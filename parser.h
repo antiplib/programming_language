@@ -220,7 +220,6 @@ private:
                 tree.push_id(*x);
             };
         }
-        //std::string tp, name;
 
 
         curr++;
