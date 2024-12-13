@@ -5,7 +5,11 @@
 #ifndef PARSER_H
 #define PARSER_H
 #include "TID.h"
-
+#include <iostream>
+#include <string>
+#include <stack>
+#include <iostream>
+#include <vector>
 extern std::vector<Token> tokens;
 extern std::string project;
 extern Bor keywords;
