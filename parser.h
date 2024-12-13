@@ -178,6 +178,8 @@ private:
         std::string name = tokens[curr].value;
         curr++;
         func *cur_func = new func(tp, name);
+        push_func(cur_func);
+        //functions.push_back(cur_func);
         if (tokens[curr].value != "(") {
             throw std::string ("( miss");
         } else {
@@ -241,7 +243,7 @@ private:
         if (tokens[curr++].value != "}") {
             throw std::string ("error - miss } it line  " + std::to_string(tokens[curr].line));
         }
-        push_func(cur_func);
+
         tree.exit_scope();
 
     }
