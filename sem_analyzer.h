@@ -6,13 +6,7 @@
 #define SEM_ANALYZER_H
 #include "Lexer.h"
 #include "head.h"
-/*
- НУЖНО ЕЩЁ
- 1) добавить выражения
- 2) rval / lval
- 3) сделать список переменных для каждой функции (перегрузка)
 
-*/
 extern std::vector<Token> tokens;
 extern std::string project;
 extern Bor keywords;
@@ -27,14 +21,14 @@ struct variable{
     bool rval = 0;
 };
 
-bool is_tp(std::string s) {
+inline bool is_tp(std::string s) {
     if(s == "int" || s == "char" || s == "string" || s == "bool" ||
        s == "float" || s == "double" ) {
         return true;
     }
     return false;
 }
-bool is_func_tp(std::string s) {
+inline bool is_func_tp(std::string s) {
     if(s == "int" || s == "char" || s == "string" ||
        s == "bool" || s == "float" || s == "double" ||
        s == "void" ) {

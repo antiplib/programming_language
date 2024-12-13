@@ -11,4 +11,8 @@ add_executable(programming_language main.cpp
         sem_analyzer.h
         sem_analyzer.cpp
         head.h
+        parser.h
+        parser.cpp
+        TID.h
+        TID.cpp
 )
