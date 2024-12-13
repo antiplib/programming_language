@@ -3,77 +3,247 @@
 #include <iostream>
 #include <vector>
 #include "sem_analyzer.h"
-#include <cctype>
 
 extern std::vector<Token> tokens;
 extern std::string project;
 extern Bor keywords;
 
+struct parametr {
+    parametr(std::string type_, std::string id_): type(type_), id(id_) {}
+    bool operator==(const parametr& other) const {
+        return type == other.type;
+    }
+    bool operator!=(const parametr& other) const {
+        return !(*this == other);
+    }
+    std::string type;
+    std::string id;
+    std::string value;
+};
+class Tid {
+public:
+    Tid(Tid* parent = nullptr) : parent_(parent) {}
+    void push_id(parametr& pr) {
+        for (parametr& i : parametrs) {
+            if (i.id == pr.id && i.type == pr.type) {
+                throw std::string ("the id already exists");
+            }
+        }
+        parametrs.push_back(pr);
+    }
+    std::pair <std::string, bool>  check_id(const std::string& id) {
+        bool flag = 0;
+        for (const parametr& i : parametrs) {
+            if (i.id == id) {
+                flag = 1;
+                return std::make_pair(i.type, 1);
+            }
+        }
+        if (flag == 0) {
+            //std::cout << "ERROR found";
+            return std::make_pair("", 0);
+        }
+
+    }
+    Tid* parent_;
+private:
+    std::vector <parametr> parametrs;
+
+};
+class Tree_Tid {
+public:
+    Tree_Tid() : current_scope_(new Tid()) {}
+
+    ~Tree_Tid() {
+        for (auto scope : scopes_) {
+            delete scope;
+        }
+        delete current_scope_;
+    }
+
+    void create_scope() {
+        Tid* new_scope = new Tid(current_scope_);
+        scopes_.push_back(new_scope);
+        current_scope_ = new_scope;
+    }
+
+
+    void exit_scope() {
+        if (!scopes_.empty()) {
+            current_scope_ = scopes_.back()->parent_;
+            scopes_.pop_back();
+        } else {
+            throw std::string ("No more scopes to exit.");
+        }
+    }
+    std::pair <std::string, bool> check_id(const std::string& id) {
+        Tid* scope = current_scope_;
+         bool flag = 0;
+        while (scope) {
+            std::string type;
+            bool fl;
+            if (scope->check_id(id).second == 0) {
+                //std::cout << "ERROR2" << std::endl;
+                return std::make_pair("", 0);
+            } else {
+                type = scope->check_id(id).first;
+            }
+
+            if (!type.empty()) {
+                flag = 1;
+                return std::make_pair(type, 1);
+            }
+            scope = scope->parent_;
+        }
+        if (flag == 0) {
+            return std::make_pair("", 0);
+        }
+        //throw ("id is not found");
+    }
+    void push_id(parametr& pr) {
+        current_scope_->push_id(pr);
+    }
+
+
+    Tid* current_scope_;
+
+private:
+   // Tid* current_scope_;
+    std::vector<Tid*> scopes_;
+};
+
+
 class  Parser {
 public:
-    Parser(std::vector<Token> tokens_) :  tokens((tokens_)), curr(0) {}
+    Parser(std::vector<Token> tokens_) : tokens((tokens_)), curr(0) {}
 
     void pars() {
         programma();
     }
+
 private:
+    Tree_Tid tree;
+    struct func {
+        func(std::string type_, std::string name_) : type_answer(type_), name(name_) {}
+        bool operator==(const func &function) const {
+            if (name == function.name && parameters.size() == function.parameters.size()) {
+                for (size_t i = 0; i < parameters.size(); ++i) {
+                    if (*parameters[i] != *function.parameters[i]) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            return false;
+        }
+
+        bool matches(const func &function) const {
+            if (parameters.size() != function.parameters.size()) {
+                //std::cout << "size not correct " << parameters.size() << " " << function.parameters.size() << std::endl;
+                return false;
+            }
+            for (size_t i = 0; i < parameters.size(); ++i) {
+                if (*parameters[i] != *function.parameters[i]) {
+                    //std::cout << "parametr != parametr" << std::endl;
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        std::string name;
+        std::string type_answer;
+        std::vector<parametr *> parameters;
+    };
+    std::vector<func*> functions;
+    void push_func(func *function) {
+        for (func *f: functions) {
+            if (*function == *f) {
+                throw std::string (" function has been declared");
+            }
+        }
+        functions.push_back(function);
+    }
+    std::string check_func(func *function) {
+        for (auto f: functions) {
+            if (function->matches(*f)) {
+                return f->type_answer;
+            }
+        }
+        throw std::string("function call is incorrect");
+    }
+
     int curr = 0;
     bool flag_for_comma = 1;
     std::vector<Token> tokens;
+
     void check_semicolon() {
         if (tokens[curr].value == ";") {
             curr++;
         } else {
-            throw("error - miss ';' it line  " + std::to_string(tokens[curr].line));
+            throw std::string ("error - miss ';' it line  " + std::to_string(tokens[curr].line));
         }
     }
 
     void declaration_id() {
         //std::cout << "here4" << tokens[curr].value << std::endl;
+        std::string type = "";
         if (tokens[curr].value == "int" || tokens[curr].value == "string" || tokens[curr].value == "double") {
+            type = tokens[curr].value;
             ++curr;
         }
 
         if (tokens[curr].type == IDENTIFIER) {
             ++curr;
-            //std::cout <<
         } else {
-            throw("error - miss IDENTIFIER it line  " + std::to_string(tokens[curr].line));
+            throw std::string ("error - miss IDENTIFIER it line  " + std::to_string(tokens[curr].line));
         }
+        parametr pr(type, tokens[curr - 1].value);
+        //std::cout << "NET" << tokens[curr].value << std::endl;
         if (tokens[curr].value == "=") {
             ++curr;
             flag_for_comma = 0;
+            std::cout << "NEEEEEE";
             expression();
+
             flag_for_comma = 1;
-        }  else if (tokens[curr].value == "[") {
+        } else if (tokens[curr].value == "[") {
             ++curr;
             expression();
             if (tokens[curr].value == "]") {
                 ++curr;
             } else {
-                throw("error - miss ] it line  " + std::to_string(tokens[curr].line));
+                throw std::string ("error - miss ] it line  " + std::to_string(tokens[curr].line));
             };
             if (tokens[curr].value == "=") {
                 ++curr;
                 if (tokens[curr].value == "{") {
                     ++curr;
                     if (tokens[curr].type == LITERAL || tokens[curr].type == IDENTIFIER) {
+                        //tree.push_id(pr);
+                        //parametr pr(type, tokens[curr].value);
                         ++curr;
                     } else {
-                        throw("error - not type 3 or not type 2 it line  " + std::to_string(tokens[curr].line));
+                        throw std::string ("error - not type 3 or not type 2 it line  " + std::to_string(tokens[curr].line));
                     }
                     while (tokens[curr].value == ",") {
                         ++curr;
+//                        std::string type = "";
+//                        if (tokens[curr].value == "int" || tokens[curr].value == "string" || tokens[curr].value == "double") {
+//                            type = tokens[curr].value;
+//                            ++curr;
+//                        }
                         if (tokens[curr].type == LITERAL || tokens[curr].type == IDENTIFIER) {
+                            //parametr pr(type, tokens[curr].value);
                             ++curr;
                         } else {
-                            throw("error - not type 3 or not type 2 it line  " + std::to_string(tokens[curr].line));
+                            throw std::string ("error - not type 3 or not type 2 it line  " + std::to_string(tokens[curr].line));
                         }
                     }
                     if (tokens[curr].value == "}") {
                         ++curr;
                     } else {
-                        throw("error - miss } it line  " + std::to_string(tokens[curr].line));
+                        throw std::string ("error - miss } it line  " + std::to_string(tokens[curr].line));
                     };
 
                 } else {
@@ -82,62 +252,105 @@ private:
             }
             //return;
         }
+        //std::cout << pr.type << " " << pr.id << std::endl;
+        tree.push_id(pr);
 
     }
+
     void declaration_many_id() {
         declaration_id();
-        while(tokens[curr + 1].value == ",") {
+        std::cout << "сheck" << tokens[curr].value << std::endl;
+        while (tokens[curr].value == ",") {
             ++curr;
             declaration_id();
+            //std::cout << "сheck" << tokens[curr].value << std::endl;
         }
     }
-    void declaration_many_parametr() {
-        declaration_parametr();
-        while(tokens[curr].value == ",") {
-            ++curr;
-            declaration_parametr();
-        }
-    }
-    void declaration_parametr() {
-        //std::cout << "checkkkk" << tokens[curr].value << std::endl;
-        if (tokens[curr].value == "int" || tokens[curr].value == "string" || tokens[curr].value == "double") {
-            curr++;
-        } else {
-            throw("error - miss int or double or string  it line  " + std::to_string(tokens[curr].line));
-        }
-        if (tokens[curr].type == IDENTIFIER) {
-            curr++;
-        } else {
-            throw("error - miss IDENTIFIER it line  " + std::to_string(tokens[curr].line));
-        }
-    }
+
     void list_instructions() {
         instruction();
     }
+
     void function() {
-        while (tokens[curr].value != ")") {
-            //std::cout << "check" << tokens[curr].value << std::endl;
-            declaration_many_parametr();
-
-
+        std::string tp = tokens[curr].value;
+        curr++;
+        std::string name = tokens[curr].value;
+        curr++;
+        func *cur_func = new func(tp, name);
+        if (tokens[curr].value != "(") {
+            throw std::string ("( miss");
+        } else {
+            curr++;
         }
+        tree.create_scope();
+        if (tokens[curr].value != ")") {
+            if (tokens[curr].value == "int" || tokens[curr].value == "string" || tokens[curr].value == "double") {
+                tp = tokens[curr].value;
+                curr++;
+            } else {
+                throw std::string ("error - miss type it line  " + std::to_string(tokens[curr].line));
+            }
+            if (tokens[curr].type == IDENTIFIER) {
+                name = tokens[curr].value;
+                curr++;
+            } else {
+                throw std::string ("error - miss IDENTIFIER it line  " + std::to_string(tokens[curr].line));
+            }
+            parametr * x = new parametr(tp, name);
+            cur_func->parameters.push_back(x);
+            tree.push_id(*x);
+            while (tokens[curr].value == ",") {
+                ++curr;
+                if (tokens[curr].value == "int" || tokens[curr].value == "string" || tokens[curr].value == "double") {
+                    tp = tokens[curr].value;
+                    curr++;
+                } else {
+                    throw std::string ("error - miss type it line  " + std::to_string(tokens[curr].line));
+                }
+                if (tokens[curr].type == IDENTIFIER) {
+                    name = tokens[curr].value;
+                    curr++;
+                } else {
+                    throw std::string ("error - miss IDENTIFIER it line  " + std::to_string(tokens[curr].line));
+                }
+                parametr * x = new parametr(tp, name);
+                cur_func->parameters.push_back(x);
+                tree.push_id(*x);
+            };
+        }
+        //std::string tp, name;
+
+
         curr++;
 
         if (tokens[curr].value != "{") {
-            throw("error - miss { it line  " + std::to_string(tokens[curr].line));
+            throw std::string ("error - miss { it line  " + std::to_string(tokens[curr].line));
         }
         curr++;
-        //std::cout << "here2" << std::endl;
+        //std::cout << "RERE" << std::endl;
         list_instructions();
-        if (tokens[curr++].value != "}") {
-            throw("error - miss } it line  " + std::to_string(tokens[curr].line));
+        if (tokens[curr].value !=  "return") {
+            throw std::string("miss return");
+
+        } else {
+            curr++;
+           // std::cout << "W HE" << std::endl;
+            function_return(cur_func) ;
         }
+        if (tokens[curr++].value != "}") {
+            throw std::string ("error - miss } it line  " + std::to_string(tokens[curr].line));
+        }
+        push_func(cur_func);
+        tree.exit_scope();
+
     }
+
     void declaration() {
         //std::cout << "SIZE= " << tokens.size() << std::endl;
-        while (curr <tokens.size() - 1) {
+        while (curr < tokens.size() - 1) {
             //std::cout << "curr" << curr;
-            if (tokens[curr].value == "void" || tokens[curr].value == "int" || tokens[curr].value == "string" || tokens[curr].value == "double") {
+            if (tokens[curr].value == "void" || tokens[curr].value == "int" || tokens[curr].value == "string" ||
+                tokens[curr].value == "double") {
                 curr++;
                 bool f = 0;
                 if (tokens[curr].value == "[") {
@@ -149,21 +362,21 @@ private:
                 if (tokens[curr].value == "]") {
                     curr++;
                 } else if (tokens[curr].value != "]" && f == 1) {
-                    throw("error - miss ] it line  " + std::to_string(tokens[curr].line));
+                    throw std::string ("error - miss ] it line  " + std::to_string(tokens[curr].line));
                 }
                 if (tokens[curr].type == IDENTIFIER) {
                     curr++;
                 } else {
-                    throw("error - miss identifier it line  " + std::to_string(tokens[curr].line));
+                    throw std::string ("error - miss identifier it line  " + std::to_string(tokens[curr].line));
                 }
                 //std::cout << "aaaa" << tokens[curr - 2].value << std::endl;
                 if (tokens[curr].value == "(") {
-                    curr++;
+                    curr -= 2;
                     //std::cout << "here" << std::endl;
                     function();
-                } else  {
+                } else {
                     if (tokens[curr - 2].value == "void") {
-                        throw("error - miss ( it line  " + std::to_string(tokens[curr - 1].line));
+                        throw std::string ("error - miss ( it line  " + std::to_string(tokens[curr - 1].line));
                     }
                     curr -= 1;
                     declaration_many_id();
@@ -173,73 +386,101 @@ private:
         }
     }
 
-    void function_return() {
-        if (tokens[curr].value == ";") {
-            ++curr;
-        } else {
-            expression();
+    void function_return(func * function) {
+        //std::cout << "exp=" <<  tokens[curr].value << std::endl;
+         if (function->type_answer == "void") {
             check_semicolon();
+            return;
         }
+         flag_for_comma = 1;
+        expression();
+        flag_for_comma = 0;
+        std::string tp = st.types.top();
+        st.types.pop();
+        if (function->type_answer == tp) {
+           check_semicolon();
+
+        } else {
+            throw std::string ("wrong type of return");
+
+        }
+
     }
+
     void call_function() {
         if (tokens[curr].type == IDENTIFIER) {
             curr++;
         } else {
-            throw("error - miss identifier it line  " + std::to_string(tokens[curr].line));
+            throw std::string ("error - miss identifier it line  " + std::to_string(tokens[curr].line));
         }
         if (tokens[curr].value == "(") {
             ++curr;
         } else {
-            throw("error - miss ( it line  " + std::to_string(tokens[curr].line));
+            throw std::string ("error - miss ( it line  " + std::to_string(tokens[curr].line));
         }
+        func *cur_func = new func(" ", " ");
         flag_for_comma = 0;
         expression();
         flag_for_comma = 1;
+        std::string tp = st.types.top();
+        parametr * x = new parametr(tp, "");
+        cur_func->parameters.push_back(x);
         while (tokens[curr].value == ",") {
             ++curr;
             flag_for_comma = 0;
             expression();
+            tp = st.types.top();
+            //std::cout << "type= " << tp << std::endl;
+            parametr * y = new parametr(tp, "");
+            cur_func->parameters.push_back(y);
+            st.types.pop();
             flag_for_comma = 1;
         }
+        //std::cout << cur_func->parameters.size();
         if (tokens[curr].value == ")") {
             ++curr;
         } else {
-            throw("error - miss ) it line  " + std::to_string(tokens[curr].line));
+            throw std::string ("error - miss ) it line  " + std::to_string(tokens[curr].line));
         }
-        //st.push_sem_stack_type(тип функции)
+        tp = check_func(cur_func);
+        //std::cout <<"tp = " <<  tp << std::endl;
+        st.push_sem_stack_type(tp);
 
     }
 
     void function_else() {
         curr++;
         if (tokens[curr].value != "{") {
-            throw("error - miss { it line  " + std::to_string(tokens[curr].line));
+            throw std::string ("error - miss { it line  " + std::to_string(tokens[curr].line));
         };
         list_instructions();
-        if (tokens[curr].value != "}")  {
-            throw("error - miss } it line  " + std::to_string(tokens[curr].line));
+        if (tokens[curr].value != "}") {
+            throw std::string ("error - miss } it line  " + std::to_string(tokens[curr].line));
         }
     }
+
     void function_elif() {
         curr++;
         if (tokens[curr].value != "(") {
-            throw("error - miss ( it line  " + std::to_string(tokens[curr].line));
+            throw std::string ("error - miss ( it line  " + std::to_string(tokens[curr].line));
         };
         expression();
         check_bool();
         if (tokens[curr++].value != ")") {
-            throw("error - miss ) it line  " + std::to_string(tokens[curr - 2].line));
+            throw std::string ("error - miss ) it line  " + std::to_string(tokens[curr - 2].line));
         }
         if (tokens[curr++].value != "{") {
-            throw("error - miss { it line  " + std::to_string(tokens[curr - 2].line));
+            throw std::string ("error - miss { it line  " + std::to_string(tokens[curr - 2].line));
         }
+        tree.create_scope();
         list_instructions();
 
-        std::cout << "IF2" << " " << tokens[curr].value << std::endl;
+        //std::cout << "IF2" << " " << tokens[curr].value << std::endl;
         if (tokens[curr++].value != "}") {
-            throw("error - miss } it line  " + std::to_string(tokens[curr - 2].line));
+            throw std::string ("error - miss } it line  " + std::to_string(tokens[curr - 2].line));
         };
-        if (tokens[curr++].value == "elif")  {
+        tree.exit_scope();
+        if (tokens[curr++].value == "elif") {
             function_elif();
         }
 
@@ -248,21 +489,23 @@ private:
     void function_if() {
         curr++;
         if (tokens[curr++].value != "(") {
-            throw("error - miss ( it line  " + std::to_string(tokens[curr - 2].line));
+            throw std::string ("error - miss ( it line  " + std::to_string(tokens[curr - 2].line));
         };
         expression();
         check_bool();
         if (tokens[curr++].value != ")") {
-            throw("error - miss ) it line  " + std::to_string(tokens[curr - 2].line));
+            throw std::string ("error - miss ) it line  " + std::to_string(tokens[curr - 2].line));
         };
         std::cout << "IF" << tokens[curr].value << std::endl;
         if (tokens[curr++].value != "{") {
-            throw("error - miss { it line  " + std::to_string(tokens[curr - 2].line));
+            throw std::string ("error - miss { it line  " + std::to_string(tokens[curr - 2].line));
         }
+        tree.create_scope();
         list_instructions();
-        if (tokens[curr++].value  != "}") {
-            throw("error - miss }* it line  " + std::to_string(tokens[curr - 2].line));
+        if (tokens[curr++].value != "}") {
+            throw std::string ("error - miss }* it line  " + std::to_string(tokens[curr - 2].line));
         }
+        tree.exit_scope();
         if (tokens[curr].value == "elif") {
             function_elif();
         }
@@ -270,55 +513,61 @@ private:
             function_else();
         }
     }
+
     void function_while() {
         curr++;
         if (tokens[curr++].value != "(") {
-            throw("error - miss ( it line  " + std::to_string(tokens[curr].line));
+            throw std::string ("error - miss ( it line  " + std::to_string(tokens[curr].line));
         }
         expression();
         check_bool();
         if (tokens[curr++].value != ")") {
-            throw("error - miss ) it line  " + std::to_string(tokens[curr - 2].line));
+            throw std::string ("error - miss ) it line  " + std::to_string(tokens[curr - 2].line));
         }
         if (tokens[curr++].value != "{") {
-            throw("error - miss { it line  " + std::to_string(tokens[curr - 2].line));
+            throw std::string ("error - miss { it line  " + std::to_string(tokens[curr - 2].line));
         }
+        tree.create_scope();
         list_instructions();
-        if (tokens[curr++].value != "}")  {
-            throw("error - miss } it line  " + std::to_string(tokens[curr - 2].line));
+        if (tokens[curr++].value != "}") {
+            throw std::string ("error - miss } it line  " + std::to_string(tokens[curr - 2].line));
         }
+        tree.exit_scope();
     }
+
     void function_case() {
         curr++;
         expression();
         if (tokens[curr++].value != "{") {
-            throw("error - miss { it line  " + std::to_string(tokens[curr - 2].line));
-        }
-        list_instructions();
-        if (tokens[curr++].value != "}")  {
-            throw("error - miss } it line  " + std::to_string(tokens[curr - 2].line));
-        }
-    }
-    void function_default() {
-        if (tokens[curr++].value != "{") {
-            throw("error - miss { it line  " + std::to_string(tokens[curr - 2].line));
+            throw std::string ("error - miss { it line  " + std::to_string(tokens[curr - 2].line));
         }
         list_instructions();
         if (tokens[curr++].value != "}") {
-            throw("error - miss { it line  " + std::to_string(tokens[curr - 2].line));
+            throw std::string ("error - miss } it line  " + std::to_string(tokens[curr - 2].line));
         }
     }
+
+    void function_default() {
+        if (tokens[curr++].value != "{") {
+            throw std::string ("error - miss { it line  " + std::to_string(tokens[curr - 2].line));
+        }
+        list_instructions();
+        if (tokens[curr++].value != "}") {
+            throw std::string ("error - miss { it line  " + std::to_string(tokens[curr - 2].line));
+        }
+    }
+
     void function_switch() {
         curr++;
         if (tokens[curr++].value != "(") {
-            throw("error - miss ( it line  " + std::to_string(tokens[curr - 2].line));
+            throw std::string ("error - miss ( it line  " + std::to_string(tokens[curr - 2].line));
         }
         expression();
-        if (tokens[curr++].value!= ")")  {
-            throw("error - miss ) it line  " + std::to_string(tokens[curr - 2].line));
+        if (tokens[curr++].value != ")") {
+            throw std::string ("error - miss ) it line  " + std::to_string(tokens[curr - 2].line));
         }
-        if (tokens[curr++].value != "{")  {
-            throw("error - miss { it line  " + std::to_string(tokens[curr - 2].line));
+        if (tokens[curr++].value != "{") {
+            throw std::string ("error - miss { it line  " + std::to_string(tokens[curr - 2].line));
         }
         while (tokens[curr].value == "case") {
             function_case();
@@ -330,13 +579,14 @@ private:
         }
 
         if (tokens[curr++].value != "}") {
-            throw("error - miss } it line  " + std::to_string(tokens[curr - 2].line));
+            throw std::string ("error - miss } it line  " + std::to_string(tokens[curr - 2].line));
         }
     }
+
     void function_for() {
         curr++;
-        if (tokens[curr++].value != "(")  {
-            throw("error - miss ( it line  " + std::to_string(tokens[curr - 2].line));
+        if (tokens[curr++].value != "(") {
+            throw std::string ("error - miss ( it line  " + std::to_string(tokens[curr - 2].line));
         }
         if (tokens[curr].value != ";") {
             declaration_id();
@@ -353,24 +603,27 @@ private:
         }
         if (tokens[curr].value != ")") {
             expression();
-            if (tokens[curr++].value!= ")")  {
-                throw("error - miss ) it line  " + std::to_string(tokens[curr - 2].line));
+            if (tokens[curr++].value != ")") {
+                throw std::string ("error - miss ) it line  " + std::to_string(tokens[curr - 2].line));
             }
         } else {
             curr++;
         }
         if (tokens[curr++].value != "{") {
-            throw("error - miss { it line  " + std::to_string(tokens[curr - 2].line));
+            throw std::string ("error - miss { it line  " + std::to_string(tokens[curr - 2].line));
         }
+        tree.create_scope();
         list_instructions();
         if (tokens[curr++].value != "}") {
-            throw("error - miss } it line  " + std::to_string(tokens[curr - 2].line));
+            throw std::string ("error - miss } it line  " + std::to_string(tokens[curr - 2].line));
         }
+        tree.exit_scope();
     }
 
     void instruction() {
         //std::cout << "istruction " << " " << tokens[curr].value << std::endl;
-        if (tokens[curr].value == "int" || tokens[curr].value == "string" || tokens[curr].value== "bool" || tokens[curr].value == "double") {
+        if (tokens[curr].value == "int" || tokens[curr].value == "string" || tokens[curr].value == "bool" ||
+            tokens[curr].value == "double") {
             declaration_many_id();
             //std::cout << "here3" << std::endl;
             check_semicolon();
@@ -379,38 +632,37 @@ private:
         } else if (tokens[curr].value == "for") {
             //std::cout << "for" << std::endl;
             function_for();
-        } else if (tokens[curr].value== "while") {
+        } else if (tokens[curr].value == "while") {
             function_while();
         } else if (tokens[curr].value == "switch") {
             function_switch();
-        }
-        else if (tokens[curr].value == "break") {
+        } else if (tokens[curr].value == "break") {
             curr++;
             check_semicolon();
-        }
-        else if (tokens[curr].value == "continue") {
+        } else if (tokens[curr].value == "continue") {
             curr++;
             check_semicolon();
-        }
-        else if (tokens[curr].value == "return") {
-            function_return();
-        } else {
-            if (tokens[curr].value == "}") {
+        }  else {
+            if (tokens[curr].value == "}" || tokens[curr].value == "return") {
                 //std::cout << "end" << std::endl;
 
                 return;
                 //std::cout << "break";
             } else {
-                //std::cout << "ree";
+                //std::cout << "ree" << std::endl;
                 expression();
+                //std::cout << "CHECH2 " << tokens[curr].value;
                 check_semicolon();
+                //std::cout << "CHECH2 " << tokens[curr].value;
             }
         }
         instruction();
     }
+
     void expression() {
         level_11();
     }
+
     void level_11() {
         level_10();
         if (flag_for_comma) {
@@ -425,19 +677,23 @@ private:
             }
         }
     }
-    void level_10(){
+
+    void level_10() {
         level_9();
         while (curr < tokens.size()) {
-            if (tokens[curr].value == "=" || tokens[curr].value== "+=" || tokens[curr].value == "-=") {
+            if (tokens[curr].value == "=" ||tokens[curr].value == "+=" || tokens[curr].value == "-=") {
                 st.push_sem_stack_lex(tokens[curr].value);
                 ++curr;
                 level_9();
+                //std::cout << "ty";
                 check_bin();
+                //std::cout << "ty";
             } else {
                 break;
             }
         }
     };
+
     void level_9() {
         level_8();
         while (curr < tokens.size()) {
@@ -451,6 +707,7 @@ private:
             }
         }
     }
+
     void level_8() {
         level_7();
         while (curr < tokens.size()) {
@@ -464,6 +721,7 @@ private:
             }
         }
     }
+
     void level_7() {
         level_6();
         while (curr < tokens.size()) {
@@ -477,6 +735,7 @@ private:
             }
         }
     }
+
     void level_6() {
         level_5();
         while (curr < tokens.size()) {
@@ -490,10 +749,12 @@ private:
             }
         }
     }
+
     void level_5() {
         level_4();
         while (curr < tokens.size()) {
-            if (tokens[curr].value == "<=" || tokens[curr].value == ">=" || tokens[curr].value == "==" || tokens[curr].value == ">" || tokens[curr].value == "<" || tokens[curr].value== "!=") {
+            if (tokens[curr].value == "<=" || tokens[curr].value == ">=" || tokens[curr].value == "==" ||
+                tokens[curr].value == ">" || tokens[curr].value == "<" || tokens[curr].value == "!=") {
                 st.push_sem_stack_lex(tokens[curr].value);
                 ++curr;
                 level_4();
@@ -503,6 +764,7 @@ private:
             }
         }
     }
+
     void level_4() {
         level_3();
         while (curr < tokens.size()) {
@@ -516,6 +778,7 @@ private:
             }
         }
     }
+
     void level_3() {
         level_2();
         while (curr < tokens.size()) {
@@ -529,33 +792,69 @@ private:
             }
         }
     }
+
     void level_2() {
         //level_1();
         //std::cout << "here5" << " " << tokens[curr].value << std::endl;
         if (tokens[curr].value == "++" || tokens[curr].value == "--") {
+            //std::cout << "CHECK " << tokens[curr].value << std::endl;
             st.push_sem_stack_lex(tokens[curr].value);
             ++curr;
+            level_1();
+           // std::cout << "wwww";
             check_uno();
+            //std::cout << "wwww";
+        } else {
+            //curr++;
+            level_1();
         }
+    }
+
+    void level_1() {
         // std::cout << "here7" << " " << tokens[curr].value << std::endl;
         if (tokens[curr].type == LITERAL || tokens[curr].type == IDENTIFIER) {
             //std::cout << "here6" << " " << tokens[curr].value << std::endl;
-            level_1();
+            //level_0();
+            if (tokens[curr + 1].value == "++" || tokens[curr + 1].value == "--") {
+                curr++;
+                st.push_sem_stack_lex(tokens[curr].value);
+                curr++;
+                std::cout << "CHECK " << tokens[curr].value << std::endl;
+                if (tokens[curr].value != ")") {
+                    level_0();
+                }
+                //level_0();
+                check_uno();
+            } else {
+                //std::cout << "apel" << std::endl;
+                level_0();
+
+            }
+
+            // check_uno();
         } else if (curr < tokens.size() && tokens[curr].value == "(") {
             ++curr;
+            //std::cout << "HERE5" << std::endl;
             expression();
+            std::cout << "HERE5*" <<  tokens[curr].value << std::endl;
             if (curr < tokens.size() && tokens[curr].value == ")") {
                 ++curr;
             } else {
-                throw("error - miss ) it line  " + std::to_string(tokens[curr].line));
+                throw std::string("error - miss ) it line  " + std::to_string(tokens[curr].line));
             }
+
+
         } else {
-            throw("error - not type 2 or not type 3 it line  " + std::to_string(tokens[curr].line));
+            if (tokens[curr].value == ";") {
+                return;
+            }
+            std::cout << "HERE " << tokens[curr].value;
+            throw std::string("error - not type 2 or not type 3 it line  " + std::to_string(tokens[curr].line));
         }
 
     }
 
-    void level_1() {
+    void level_0() {
         //std::cout << "here6" << " " << tokens[curr].value << std::endl;
         if (tokens[curr].type == LITERAL) {
             bool fl_chislo = 1;
@@ -578,18 +877,33 @@ private:
                 }
             }
             ++curr;
+            //std::cout << "WER" << tokens[curr].value << std::endl;
         } else if (tokens[curr].type == IDENTIFIER) {
             if (tokens[curr + 1].value == "(") {
+                std::cout << "call_function" << std::endl;
                 call_function();
             } else {
-                // проверка переменной
-                //st.push_sem_stack_type(тип переменной);
+                //std::cout << "here7" << tp << std::endl;
+                std::string tp;
+                //std::cout << "here7" << tokens[curr].value << std::endl;
+                if (tree.check_id(tokens[curr].value).second == 0) {
+                    //std::cout << "here7" << std::endl;
+                    throw std::string("id is not found");
+                } else {
+                    //std::cout << "here7" << std::endl;
+                    tp = tree.check_id(tokens[curr].value).first;
+                }
+                st.push_sem_stack_type(tp);
                 ++curr;
             }
+        } else if (tokens[curr].value == ";") {
+
         } else {
+            //std::cout << "HERE3 " << tokens[curr].value;
             throw("error - not type 2 or not type 3 it line  " + std::to_string(tokens[curr].line));
         }
     }
+
     void programma() {
         try {
             declaration();
@@ -613,23 +927,30 @@ private:
             }
         }
         void push_sem_stack_lex(std::string lex) {
-            types.push(lex);
+            operations.push(lex);
         }
         void push_sem_stack_type(std::string type) {
-            operations.push(type);
+            types.push(type);
         }
     };
 
     void check_bin() {
         std::string type_l = st.types.top();
+        std::cout << type_l;
         st.types.pop();
-        std::string type_r = st.types.top();
-        st.types.pop();
+        std::string type_r;
+        if (st.types.size() == 0) {
+            type_r = "";
+        } else {
+            type_r = st.types.top();
+            st.types.pop();
+        }
         std::string operation = st.operations.top();
         st.operations.pop();
         if (operation == ",") {
             st.types.push(type_l);
         }
+        // std::cout << "Check_bin" << type_l << type_r << std::endl;
         if (type_l == "int" && type_r == "int") {
                 st.types.push("int");
         } else if ((type_l == "float" || type_l == "int") && (type_r == "float" || type_r == "int") ){
@@ -642,10 +963,10 @@ private:
             if (operation == "==" || operation == "!=" || operation == "=") {
                 st.types.push("string");
             } else {
-                throw("error - operation not correct ");
+                throw std::string("error - operation not correct ");
             }
         } else {
-            throw("error - types are not correct ");
+            throw std::string("error - types are not correct ");
         }
     }
     void check_uno() {
@@ -653,23 +974,25 @@ private:
         st.types.pop();
         std::string operation = st.operations.top();
         st.operations.pop();
-        if (type != "int" &&  type != "float" && type != "bool") {
+        // std::cout << "TYPE=" << type << std::endl;
+        // std::cout << "operation=" << operation << std::endl;
+        if (type != "int" &&  type  != "float" && type != "bool") {
             if (operation == "*" || operation == "&") {
                 st.types.push(type);
             } else {
-                throw(" error - type is not correct with operation");
+                throw std::string(" error - type is not correct with operation");
             }
         } else {
             if ((type == "bool" || type == "float")  && (operation == "++" || operation == "--")) {
-                throw(" error - operation is not correct with bool or  float");
+                throw std::string(" error - operation is not correct with bool or  float");
             }
-            st.types.push(type);
+            st.types.push(type );
         }
     }
     bool check_bool() {
         std::string type = st.types.top();
         if (type != "bool" && type != "int") {
-            throw(" error - type is not bool or int ");
+            throw std::string(" error - type is not bool or int ");
         }
         return true;
     }

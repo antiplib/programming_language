@@ -1,8 +1,10 @@
-int b(int c) {
-    c++;
-};
-void  main( int c) {
-    int a;
-    int b;
-    double m;
+int f(int a, int c) {
+    a = 5;
+    c = 0;
+    return f(5,5);
+}
+int main() {
+    int b = 0;
+    b = 5;
+    return f(1, 2, 3);
 }
