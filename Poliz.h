@@ -11,8 +11,8 @@ extern std::string project;
 extern Bor keywords;
 
 struct node {
-    node(Token &tok, bool operand,  bool is_function = 0)  {
-        token = &tok;
+    node(Token tok, bool operand,  bool is_function = 0)  {
+        token = new Token(tok);
         operand = operand;
         is_func = is_function;
     }
@@ -68,7 +68,7 @@ int get_prior(const std::string& op) {
 
  std::vector<node> POLIZ;
 
-inline void push_poliz(Token &token, bool is_function = 0) {
+inline void push_poliz(Token token, bool is_function = 0) {
     if(!need(token)) {
         return;
     }

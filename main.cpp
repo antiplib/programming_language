@@ -35,6 +35,6 @@ int main(int argc, char* argv[]) {
     //sem_analyzer a(lexer());
     std::cout <<  "------------------------" << std::endl;
     for (auto i : POLIZ) {
-        std::cout <<i.token<<' ';
+        std::cout <<i.token->value<<' ';
     }
 }

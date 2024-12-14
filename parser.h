@@ -15,6 +15,19 @@ extern std::string project;
 extern Bor keywords;
 extern std::vector<node> POLIZ;
 
+int getPrecedence(const std::string& op) {
+    if (op == "++" || op == "--") return 6; //Унарный
+    if (op == "*" || op == "/") return 5;
+    if (op == "+" || op == "-") return 4;
+    if (op == "<" || op == ">" || op == "<=" || op == ">=" || op == "==" || op == "!=") return 3;
+    if(op == "&") return 2;
+    if(op == "|") return 1;
+    if (op == "&&") return 0;
+    if (op == "||") return 0;
+    if (op == "=" || op == "+=" || op == "-=") return 0;
+    if (op == "(") return -1;
+    return -2; // Для прочих случаев (можно сделать ошибку)
+}
 
 class  Parser {
 public:
@@ -587,9 +600,15 @@ private:
         level_9();
         while (curr < tokens.size()) {
             if (tokens[curr].value == "=" ||tokens[curr].value == "+=" || tokens[curr].value == "-=") {
+                while(!st.operations.empty() && getPrecedence(st.operations.top()) >= getPrecedence(tokens[curr].value)){
+                    push_poliz(Token(OPERATOR, st.operations.top(), -1));
+                    st.operations.pop();
+                }
+
                 st.push_sem_stack_lex(tokens[curr].value);
                 ++curr;
                 level_9();
+
                 //std::cout << "ty";
                 check_bin();
                 //std::cout << "ty";
@@ -603,6 +622,10 @@ private:
         level_8();
         while (curr < tokens.size()) {
             if (tokens[curr].value == "||") {
+                while(!st.operations.empty() && getPrecedence(st.operations.top()) >= getPrecedence(tokens[curr].value)){
+                    push_poliz(Token(OPERATOR, st.operations.top(), -1));
+                    st.operations.pop();
+                }
                 st.push_sem_stack_lex(tokens[curr].value);
                 ++curr;
                 level_8();
@@ -617,6 +640,10 @@ private:
         level_7();
         while (curr < tokens.size()) {
             if (tokens[curr].value == "&&") {
+                while(!st.operations.empty() && getPrecedence(st.operations.top()) >= getPrecedence(tokens[curr].value)){
+                    push_poliz(Token(OPERATOR, st.operations.top(), -1));
+                    st.operations.pop();
+                }
                 push_poliz(tokens[curr], false);
                 st.push_sem_stack_lex(tokens[curr].value);
                 ++curr;
@@ -632,6 +659,11 @@ private:
         level_6();
         while (curr < tokens.size()) {
             if (tokens[curr].value == "|") {
+
+                while(!st.operations.empty() && getPrecedence(st.operations.top()) >= getPrecedence(tokens[curr].value)){
+                    push_poliz(Token(OPERATOR, st.operations.top(), -1));
+                    st.operations.pop();
+                }
                 st.push_sem_stack_lex(tokens[curr].value);
                 push_poliz(tokens[curr], false);
                 ++curr;
@@ -647,6 +679,10 @@ private:
         level_5();
         while (curr < tokens.size()) {
             if (tokens[curr].value == "&") {
+                while(!st.operations.empty() && getPrecedence(st.operations.top()) >= getPrecedence(tokens[curr].value)){
+                    push_poliz(Token(OPERATOR, st.operations.top(), -1));
+                    st.operations.pop();
+                }
                 push_poliz(tokens[curr], false);
 
                 st.push_sem_stack_lex(tokens[curr].value);
@@ -664,9 +700,12 @@ private:
         while (curr < tokens.size()) {
             if (tokens[curr].value == "<=" || tokens[curr].value == ">=" || tokens[curr].value == "==" ||
                 tokens[curr].value == ">" || tokens[curr].value == "<" || tokens[curr].value == "!=") {
+                while(!st.operations.empty() && getPrecedence(st.operations.top()) >= getPrecedence(tokens[curr].value)){
+                    push_poliz(Token(OPERATOR, st.operations.top(), -1));
+                    st.operations.pop();
+                }
                 st.push_sem_stack_lex(tokens[curr].value);
                 push_poliz(tokens[curr], false);
-
                 ++curr;
                 level_4();
                 check_bin();
@@ -680,6 +719,10 @@ private:
         level_3();
         while (curr < tokens.size()) {
             if (tokens[curr].value == "+" || tokens[curr].value == "-") {
+                while(!st.operations.empty() && getPrecedence(st.operations.top()) >= getPrecedence(tokens[curr].value)){
+                    push_poliz(Token(OPERATOR, st.operations.top(), -1));
+                    st.operations.pop();
+                }
                 st.push_sem_stack_lex(tokens[curr].value);
                 push_poliz(tokens[curr], false);
 
@@ -696,6 +739,10 @@ private:
         level_2();
         while (curr < tokens.size()) {
             if (tokens[curr].value == "*" || tokens[curr].value == "/") {
+                while(!st.operations.empty() && getPrecedence(st.operations.top()) >= getPrecedence(tokens[curr].value)){
+                    push_poliz(Token(OPERATOR, st.operations.top(), -1));
+                    st.operations.pop();
+                }
                 st.push_sem_stack_lex(tokens[curr].value);
                 push_poliz(tokens[curr], false);
 
@@ -712,9 +759,17 @@ private:
         //level_1();
         //std::cout << "here5" << " " << tokens[curr].value << std::endl;
         if (tokens[curr].value == "++" || tokens[curr].value == "--") {
+            while(!st.operations.empty() && getPrecedence(st.operations.top()) >= getPrecedence(tokens[curr].value)){
+                push_poliz(Token(OPERATOR, st.operations.top(), -1));
+                st.operations.pop();
+            }
             //std::cout << "CHECK " << tokens[curr].value << std::endl;
             st.push_sem_stack_lex(tokens[curr].value);
             push_poliz(tokens[curr], false);
+            if (tokens[curr].type == LITERAL || tokens[curr].type == IDENTIFIER)
+            {
+                st.push_sem_stack_value(tokens[curr-1].value);
+            }
             ++curr;
             level_1();
            // std::cout << "wwww";
@@ -793,6 +848,9 @@ private:
                 }
             }
             push_poliz(tokens[curr], false);
+
+            st.push_sem_stack_value(tokens[curr].value); // Добавляем значение литерала
+
             ++curr;
             //std::cout << "WER" << tokens[curr].value << std::endl;
         } else if (tokens[curr].type == IDENTIFIER) {
@@ -837,6 +895,7 @@ private:
     struct sem_stack {
         std::stack <std::string> types;
         std::stack <std::string> operations;
+        std::stack <std::string> values;
         void stack_clear() {
             while (types.empty()) {
                 types.pop();
@@ -845,6 +904,10 @@ private:
                 operations.pop();
             }
         }
+        void push_sem_stack_value(std::string s) {
+            values.push(s);
+        }
+
         void push_sem_stack_lex(std::string lex) {
             operations.push(lex);
         }
@@ -865,7 +928,7 @@ private:
             st.types.pop();
         }
         std::string operation = st.operations.top();
-        st.operations.pop();
+
         if (operation == ",") {
             st.types.push(type_l);
         }
@@ -887,6 +950,9 @@ private:
         } else {
             throw std::string("error - types are not correct ");
         }
+        Token t(OPERATOR, st.operations.top(), -1);
+        push_poliz(t, false);
+        st.operations.pop();
     }
     void check_uno() {
         std::string type = st.types.top();

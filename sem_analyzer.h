@@ -73,7 +73,7 @@ public:
         type_of_func[name] = type;
     }
 
-    bool is_defin(std::string name) { // определена ли функция
+    bool is_defin(std::string name) {
         return is_defined[name];
     }
 
