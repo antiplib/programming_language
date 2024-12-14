@@ -644,7 +644,6 @@ private:
                     push_poliz(Token(OPERATOR, st.operations.top(), -1));
                     st.operations.pop();
                 }
-                push_poliz(tokens[curr], false);
                 st.push_sem_stack_lex(tokens[curr].value);
                 ++curr;
                 level_7();
@@ -665,7 +664,6 @@ private:
                     st.operations.pop();
                 }
                 st.push_sem_stack_lex(tokens[curr].value);
-                push_poliz(tokens[curr], false);
                 ++curr;
                 level_6();
                 check_bin();
@@ -683,7 +681,6 @@ private:
                     push_poliz(Token(OPERATOR, st.operations.top(), -1));
                     st.operations.pop();
                 }
-                push_poliz(tokens[curr], false);
 
                 st.push_sem_stack_lex(tokens[curr].value);
                 ++curr;
@@ -705,7 +702,6 @@ private:
                     st.operations.pop();
                 }
                 st.push_sem_stack_lex(tokens[curr].value);
-                push_poliz(tokens[curr], false);
                 ++curr;
                 level_4();
                 check_bin();
@@ -724,7 +720,6 @@ private:
                     st.operations.pop();
                 }
                 st.push_sem_stack_lex(tokens[curr].value);
-                push_poliz(tokens[curr], false);
 
                 ++curr;
                 level_3();
@@ -744,7 +739,6 @@ private:
                     st.operations.pop();
                 }
                 st.push_sem_stack_lex(tokens[curr].value);
-                push_poliz(tokens[curr], false);
 
                 ++curr;
                 level_2();
@@ -765,7 +759,6 @@ private:
             }
             //std::cout << "CHECK " << tokens[curr].value << std::endl;
             st.push_sem_stack_lex(tokens[curr].value);
-            push_poliz(tokens[curr], false);
             if (tokens[curr].type == LITERAL || tokens[curr].type == IDENTIFIER)
             {
                 st.push_sem_stack_value(tokens[curr-1].value);
