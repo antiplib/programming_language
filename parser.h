@@ -4,7 +4,7 @@
 
 #ifndef PARSER_H
 #define PARSER_H
-#include "TID.h"
+#include "poliz.h"
 #include <iostream>
 #include <string>
 #include <stack>
@@ -13,6 +13,8 @@
 extern std::vector<Token> tokens;
 extern std::string project;
 extern Bor keywords;
+
+
 
 class  Parser {
 public:
