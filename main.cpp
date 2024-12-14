@@ -7,6 +7,7 @@
 extern std::vector<Token> tokens;
 extern std::string project;
 extern Bor keywords;
+extern std::vector<node> POLIZ;
 
 
 void get_filename(int argc, char* argv[]) {
@@ -33,4 +34,7 @@ int main(int argc, char* argv[]) {
     tokens.clear();
     //sem_analyzer a(lexer());
     std::cout <<  "------------------------" << std::endl;
+    for (auto i : POLIZ) {
+        std::cout <<i.token<<' ';
+    }
 }

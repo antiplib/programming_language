@@ -66,22 +66,19 @@ int get_prior(const std::string& op) {
     }
 }
 
-extern std::vector<node> POLIZ;
-extern std::stack <node> d;
+ std::vector<node> POLIZ;
 
-void push_poliz(Token &token, bool is_function = 0) {
+inline void push_poliz(Token &token, bool is_function = 0) {
     if(!need(token)) {
         return;
     }
     bool frst = is_operand(token);
     bool scnd = is_operator(token);
-    if(frst || scnd) {
         if(frst)
             POLIZ.push_back(node(token,1, is_function));
         else {
             POLIZ.push_back(node(token,0, is_function));
         }
-    }
 }
 
 

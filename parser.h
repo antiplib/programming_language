@@ -13,7 +13,7 @@
 extern std::vector<Token> tokens;
 extern std::string project;
 extern Bor keywords;
-
+extern std::vector<node> POLIZ;
 
 
 class  Parser {
@@ -65,6 +65,7 @@ private:
                 throw std::string (" function has been declared");
             }
         }
+
         functions.push_back(function);
     }
     std::string check_func(func *function) {
@@ -311,6 +312,7 @@ private:
     }
 
     void call_function() {
+        push_poliz(tokens[curr], true);
         if (tokens[curr].type == IDENTIFIER) {
             curr++;
         } else {
@@ -615,6 +617,7 @@ private:
         level_7();
         while (curr < tokens.size()) {
             if (tokens[curr].value == "&&") {
+                push_poliz(tokens[curr], false);
                 st.push_sem_stack_lex(tokens[curr].value);
                 ++curr;
                 level_7();
@@ -630,6 +633,7 @@ private:
         while (curr < tokens.size()) {
             if (tokens[curr].value == "|") {
                 st.push_sem_stack_lex(tokens[curr].value);
+                push_poliz(tokens[curr], false);
                 ++curr;
                 level_6();
                 check_bin();
@@ -643,6 +647,8 @@ private:
         level_5();
         while (curr < tokens.size()) {
             if (tokens[curr].value == "&") {
+                push_poliz(tokens[curr], false);
+
                 st.push_sem_stack_lex(tokens[curr].value);
                 ++curr;
                 level_5();
@@ -659,6 +665,8 @@ private:
             if (tokens[curr].value == "<=" || tokens[curr].value == ">=" || tokens[curr].value == "==" ||
                 tokens[curr].value == ">" || tokens[curr].value == "<" || tokens[curr].value == "!=") {
                 st.push_sem_stack_lex(tokens[curr].value);
+                push_poliz(tokens[curr], false);
+
                 ++curr;
                 level_4();
                 check_bin();
@@ -673,6 +681,8 @@ private:
         while (curr < tokens.size()) {
             if (tokens[curr].value == "+" || tokens[curr].value == "-") {
                 st.push_sem_stack_lex(tokens[curr].value);
+                push_poliz(tokens[curr], false);
+
                 ++curr;
                 level_3();
                 check_bin();
@@ -687,6 +697,8 @@ private:
         while (curr < tokens.size()) {
             if (tokens[curr].value == "*" || tokens[curr].value == "/") {
                 st.push_sem_stack_lex(tokens[curr].value);
+                push_poliz(tokens[curr], false);
+
                 ++curr;
                 level_2();
                 check_bin();
@@ -702,6 +714,7 @@ private:
         if (tokens[curr].value == "++" || tokens[curr].value == "--") {
             //std::cout << "CHECK " << tokens[curr].value << std::endl;
             st.push_sem_stack_lex(tokens[curr].value);
+            push_poliz(tokens[curr], false);
             ++curr;
             level_1();
            // std::cout << "wwww";
@@ -779,6 +792,7 @@ private:
                     st.push_sem_stack_type("int");
                 }
             }
+            push_poliz(tokens[curr], false);
             ++curr;
             //std::cout << "WER" << tokens[curr].value << std::endl;
         } else if (tokens[curr].type == IDENTIFIER) {
@@ -797,6 +811,8 @@ private:
                     tp = tree.check_id(tokens[curr].value).first;
                 }
                 st.push_sem_stack_type(tp);
+                push_poliz(tokens[curr], false);
+
                 ++curr;
             }
         } else if (tokens[curr].value == ";") {
@@ -889,7 +905,7 @@ private:
             if ((type == "bool" || type == "float")  && (operation == "++" || operation == "--")) {
                 throw std::string(" error - operation is not correct with bool or  float");
             }
-            st.types.push(type );
+            st.types.push(type);
         }
     }
     bool check_bool() {
