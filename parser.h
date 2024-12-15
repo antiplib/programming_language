@@ -195,7 +195,7 @@ private:
         curr++;
         std::string name = tokens[curr].value;
         curr++;
-        push_poliz("FUNC_START");
+        // push_poliz("FUNC_START");
         push_poliz(name);
         push_poliz(tp);
         func *cur_func = new func(tp, name);
@@ -219,7 +219,7 @@ private:
             } else {
                 throw std::string ("error - miss IDENTIFIER it line  " + std::to_string(tokens[curr].line));
             }
-            push_poliz("PARAM");
+            // push_poliz("PARAM");
             push_poliz(tp);
             push_poliz(name);
             parametr * x = new parametr(tp, name);
@@ -239,7 +239,7 @@ private:
                 } else {
                     throw std::string ("error - miss IDENTIFIER it line  " + std::to_string(tokens[curr].line));
                 }
-                push_poliz("PARAM");
+                // push_poliz("PARAM");
                 push_poliz(tp);
                 push_poliz(name);
                 parametr * x = new parametr(tp, name);
@@ -254,7 +254,7 @@ private:
         if (tokens[curr].value != "{") {
             throw std::string ("error - miss { it line  " + std::to_string(tokens[curr].line));
         }
-        push_poliz("FUNC_BODY_START");
+        // push_poliz("FUNC_BODY_START");
         curr++;
         //std::cout << "RERE" << std::endl;
         list_instructions();
@@ -269,7 +269,7 @@ private:
         if (tokens[curr++].value != "}") {
             throw std::string ("error - miss } it line  " + std::to_string(tokens[curr].line));
         }
-        push_poliz("END_FUNC");
+        // push_poliz("END_FUNC");
         tree.exit_scope();
 
     }
@@ -320,7 +320,7 @@ private:
         //std::cout << "exp=" <<  tokens[curr].value << std::endl;;
 
          if (function->type_answer == "void") {
-             push_poliz("VOID_RETURN");
+             push_poliz("RETURN");
             check_semicolon();
             return;
         }
@@ -331,7 +331,6 @@ private:
         st.types.pop();
         push_poliz(st.values.top());
         st.values.pop();
-        push_poliz(tp);
         push_poliz("RETURN");
         if (function->type_answer == tp) {
            check_semicolon();
@@ -372,6 +371,8 @@ private:
             cur_func->parameters.push_back(y);
             st.types.pop();
             flag_for_comma = 1;
+
+
         }
         //std::cout << cur_func->parameters.size();
         if (tokens[curr].value == ")") {
