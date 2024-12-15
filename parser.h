@@ -419,6 +419,11 @@ private:
         if (tokens[curr++].value != "{") {
             throw std::string ("error - miss { it line  " + std::to_string(tokens[curr - 2].line));
         }
+        int zap = POLIZ.size();
+
+        push_poliz(std::to_string(zap));
+
+        push_poliz("!F");
         //tree.create_scope();
         list_instructions();
 
@@ -427,6 +432,7 @@ private:
             throw std::string ("error - miss } it line  " + std::to_string(tokens[curr - 2].line));
         };
         //tree.exit_scope();
+        POLIZ[zap].token->value = std::to_string(POLIZ.size() + 1);
         if (tokens[curr++].value == "elif") {
             function_elif();
         }
@@ -439,7 +445,6 @@ private:
         };
         expression();
         check_bool();
-        int zap = POLIZ.size();
         if (tokens[curr].value != ")") {
             throw std::string ("error - miss ) it line  " + std::to_string(tokens[curr - 2].line));
         } else {
@@ -454,6 +459,11 @@ private:
         std::cout << "here8 = " <<  tokens[curr].value << std::endl;
         //tree.create_scope();
         //st.stack_clear();
+        int zap = POLIZ.size();
+
+        push_poliz(std::to_string(zap));
+
+        push_poliz("!F");
         list_instructions();
         std::cout << "here9 = " << tokens[curr].value << std::endl;
         //curr++;
@@ -465,9 +475,9 @@ private:
             curr++;
         }
         //tree.exit_scope();
-        push_poliz(std::to_string( zap));
 
-        push_poliz("!F");
+        POLIZ[zap].token->value = std::to_string(POLIZ.size()+1);
+
         if (tokens[curr].value == "elif") {
             function_elif();
         }
@@ -475,6 +485,7 @@ private:
         if (tokens[curr].value == "else") {
             function_else();
         }
+
     }
 
     void function_while() {
