@@ -67,8 +67,12 @@ int get_prior(const std::string& op) {
 }
 
  std::vector<node> POLIZ;
-
-inline void push_poliz(Token token, bool is_function = 0) {
+ void push_poliz(Token token, bool is_function = 0);
+void push_poliz(std::string s) {
+    Token t(OPERATOR, s, -1);
+    push_poliz(t);
+}
+ void push_poliz(Token token, bool is_function ) {
     if(!need(token)) {
         return;
     }

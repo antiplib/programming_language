@@ -109,7 +109,6 @@ private:
             type = tokens[curr].value;
             ++curr;
         }
-
         if (tokens[curr].type == IDENTIFIER) {
             ++curr;
         } else {
@@ -117,14 +116,18 @@ private:
         }
         parametr pr(type, tokens[curr - 1].value);
         //std::cout << "NET" << tokens[curr].value << std::endl;
+        push_poliz(type);
+        push_poliz(tokens[curr - 1].value);
+
         if (tokens[curr].value == "=") {
             ++curr;
             flag_for_comma = 0;
             std::cout << "NEEEEEE";
             expression();
-
             flag_for_comma = 1;
-        } else if (tokens[curr].value == "[") {
+            push_poliz("=");
+        }
+        else if (tokens[curr].value == "[") {
             ++curr;
             expression();
             if (tokens[curr].value == "]") {
@@ -171,7 +174,6 @@ private:
         }
         //std::cout << pr.type << " " << pr.id << std::endl;
         tree.push_id(pr);
-
     }
 
     void declaration_many_id() {
@@ -193,6 +195,9 @@ private:
         curr++;
         std::string name = tokens[curr].value;
         curr++;
+        push_poliz("FUNC_START");
+        push_poliz(name);
+        push_poliz(tp);
         func *cur_func = new func(tp, name);
         push_func(cur_func);
         if (tokens[curr].value != "(") {
@@ -214,6 +219,9 @@ private:
             } else {
                 throw std::string ("error - miss IDENTIFIER it line  " + std::to_string(tokens[curr].line));
             }
+            push_poliz("PARAM");
+            push_poliz(tp);
+            push_poliz(name);
             parametr * x = new parametr(tp, name);
             cur_func->parameters.push_back(x);
             tree.push_id(*x);
@@ -231,6 +239,9 @@ private:
                 } else {
                     throw std::string ("error - miss IDENTIFIER it line  " + std::to_string(tokens[curr].line));
                 }
+                push_poliz("PARAM");
+                push_poliz(tp);
+                push_poliz(name);
                 parametr * x = new parametr(tp, name);
                 cur_func->parameters.push_back(x);
                 tree.push_id(*x);
@@ -243,6 +254,7 @@ private:
         if (tokens[curr].value != "{") {
             throw std::string ("error - miss { it line  " + std::to_string(tokens[curr].line));
         }
+        push_poliz("FUNC_BODY_START");
         curr++;
         //std::cout << "RERE" << std::endl;
         list_instructions();
@@ -257,7 +269,7 @@ private:
         if (tokens[curr++].value != "}") {
             throw std::string ("error - miss } it line  " + std::to_string(tokens[curr].line));
         }
-
+        push_poliz("END_FUNC");
         tree.exit_scope();
 
     }
@@ -289,6 +301,7 @@ private:
                 //std::cout << "aaaa" << tokens[curr - 2].value << std::endl;
                 if (tokens[curr].value == "(") {
                     curr -= 2;
+
                     //std::cout << "here" << std::endl;
                     function();
                 } else {
@@ -304,8 +317,10 @@ private:
     }
 
     void function_return(func * function) {
-        //std::cout << "exp=" <<  tokens[curr].value << std::endl;
+        //std::cout << "exp=" <<  tokens[curr].value << std::endl;;
+
          if (function->type_answer == "void") {
+             push_poliz("VOID_RETURN");
             check_semicolon();
             return;
         }
@@ -314,6 +329,10 @@ private:
         flag_for_comma = 0;
         std::string tp = st.types.top();
         st.types.pop();
+        push_poliz(st.values.top());
+        st.values.pop();
+        push_poliz(tp);
+        push_poliz("RETURN");
         if (function->type_answer == tp) {
            check_semicolon();
 
@@ -636,7 +655,6 @@ private:
                 st.push_sem_stack_lex(tokens[curr].value);
                 ++curr;
                 level_9();
-
                 //std::cout << "ty";
                 check_bin();
                 //std::cout << "ty";
@@ -781,16 +799,19 @@ private:
         //level_1();
         //std::cout << "here5" << " " << tokens[curr].value << std::endl;
         if (tokens[curr].value == "++" || tokens[curr].value == "--") {
+            st.push_sem_stack_lex(tokens[curr].value);
             while(!st.operations.empty() && getPrecedence(st.operations.top()) >= getPrecedence(tokens[curr].value)){
                 push_poliz(Token(OPERATOR, st.operations.top(), -1));
                 st.operations.pop();
             }
+
             //std::cout << "CHECK " << tokens[curr].value << std::endl;
-            st.push_sem_stack_lex(tokens[curr].value);
             if (tokens[curr].type == LITERAL || tokens[curr].type == IDENTIFIER)
             {
                 st.push_sem_stack_value(tokens[curr-1].value);
+                push_poliz(tokens[curr].value);
             }
+
             ++curr;
             level_1();
            // std::cout << "wwww";
@@ -849,10 +870,8 @@ private:
                     st.push_sem_stack_type("int");
                 }
             }
-            push_poliz(tokens[curr], false);
-
             st.push_sem_stack_value(tokens[curr].value); // Добавляем значение литерала
-
+            push_poliz(tokens[curr].value);
             ++curr;
             //std::cout << "WER" << tokens[curr].value << std::endl;
         } else if (tokens[curr].type == IDENTIFIER) {
@@ -872,7 +891,6 @@ private:
                 }
                 st.push_sem_stack_type(tp);
                 push_poliz(tokens[curr], false);
-
                 ++curr;
             }
         } else if (tokens[curr].value == ";") {
