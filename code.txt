@@ -9,8 +9,14 @@ void main() {
     int c=6;
    c = 6;
    b = 4;
+   a = 1;
+   if(a > b) {
+        a = b;
+        b = -1;
+   } else {
+
+   }
    a = b + c;
    f(a, c);
-
     return;
 }

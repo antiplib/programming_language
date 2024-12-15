@@ -405,7 +405,6 @@ private:
         if (tokens[curr].value == "elif") {
             curr++;
         }
-
         std::cout << "re " <<tokens[curr].value << std::endl;
         if (tokens[curr].value != "(") {
             throw std::string ("error - miss ( it line  " + std::to_string(tokens[curr].line));
@@ -431,7 +430,6 @@ private:
         if (tokens[curr++].value == "elif") {
             function_elif();
         }
-
     }
 
     void function_if() {
@@ -441,6 +439,8 @@ private:
         };
         expression();
         check_bool();
+        int zap = POLIZ.size();
+        push_poliz("1");
         if (tokens[curr].value != ")") {
             throw std::string ("error - miss ) it line  " + std::to_string(tokens[curr - 2].line));
         } else {
@@ -466,6 +466,8 @@ private:
             curr++;
         }
         //tree.exit_scope();
+        POLIZ[zap].token->value = std::to_string(POLIZ.size());
+        push_poliz("!F");
         if (tokens[curr].value == "elif") {
             function_elif();
         }
