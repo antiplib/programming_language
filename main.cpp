@@ -36,6 +36,6 @@ int main(int argc, char* argv[]) {
     std::cout <<  "------------------------" << std::endl;
     int cnt = 1;
     for (auto i : POLIZ) {
-        std::cout <<cnt++ <<' ' <<i.token->value<<'\n';
+        std::cout << "<POLIZ Number: " <<cnt++  << "> "<<i.token->value<<'\n';
     }
 }
