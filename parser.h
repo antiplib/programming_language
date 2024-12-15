@@ -440,7 +440,6 @@ private:
         expression();
         check_bool();
         int zap = POLIZ.size();
-        push_poliz("1");
         if (tokens[curr].value != ")") {
             throw std::string ("error - miss ) it line  " + std::to_string(tokens[curr - 2].line));
         } else {
@@ -466,7 +465,8 @@ private:
             curr++;
         }
         //tree.exit_scope();
-        POLIZ[zap].token->value = std::to_string(POLIZ.size());
+        push_poliz(std::to_string( zap));
+
         push_poliz("!F");
         if (tokens[curr].value == "elif") {
             function_elif();
@@ -843,11 +843,11 @@ private:
             level_0();
             check_uno();
         }  else  {
-            if (tokens[curr].value == "{") {
+            if (tokens[curr ].value == "{") {
                 return;
             }
             std::cout << "error" << tokens[curr].value;
-            throw std::string ("error");
+             throw std::string ("error");
         }
     }
 

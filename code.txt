@@ -12,9 +12,7 @@ void main() {
    a = 1;
    if(a > b) {
         a = b;
-        b = -1;
-   } else {
-
+        b = a-1;
    }
    a = b + c;
    f(a, c);
