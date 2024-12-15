@@ -263,7 +263,7 @@ private:
 
         } else {
             curr++;
-           // std::cout << "W HE" << std::endl;
+            // std::cout << "W HE" << std::endl;
             function_return(cur_func) ;
         }
         if (tokens[curr++].value != "}") {
@@ -319,12 +319,12 @@ private:
     void function_return(func * function) {
         //std::cout << "exp=" <<  tokens[curr].value << std::endl;;
 
-         if (function->type_answer == "void") {
-             push_poliz("RETURN");
+        if (function->type_answer == "void") {
+            push_poliz("RETURN");
             check_semicolon();
             return;
         }
-         flag_for_comma = 1;
+        flag_for_comma = 1;
         expression();
         flag_for_comma = 0;
         std::string tp = st.types.top();
@@ -333,7 +333,7 @@ private:
         st.values.pop();
         push_poliz("RETURN");
         if (function->type_answer == tp) {
-           check_semicolon();
+            check_semicolon();
 
         } else {
             throw std::string ("wrong type of return");
@@ -393,12 +393,15 @@ private:
         } else {
             curr++;
         }
+        tree.create_scope();
+        st.stack_clear();
         list_instructions();
         if (tokens[curr].value != "}") {
             throw std::string ("error - miss } it line  " + std::to_string(tokens[curr].line));
         } else {
             curr++;
         }
+        tree.exit_scope();
     }
 
     void function_elif() {
@@ -424,7 +427,8 @@ private:
         push_poliz(std::to_string(zap));
 
         push_poliz("!F");
-        //tree.create_scope();
+        tree.create_scope();
+        st.stack_clear();
         list_instructions();
         int zap2 = POLIZ.size();
         push_poliz(std::to_string(zap2));
@@ -434,12 +438,13 @@ private:
         if (tokens[curr++].value != "}") {
             throw std::string ("error - miss } it line  " + std::to_string(tokens[curr - 2].line));
         };
-        //tree.exit_scope();
-        if (tokens[curr++].value == "elif") {
+        tree.exit_scope();
+        if (tokens[curr].value == "elif") {
             function_elif();
         }
         POLIZ[zap].token->value= std::to_string(POLIZ.size() + 1);
         if (tokens[curr].value == "else") {
+            std::cout << "ELSE" << std::endl;
             function_else();
         }
         POLIZ[zap2].token->value= std::to_string(POLIZ.size() + 1);
@@ -464,8 +469,8 @@ private:
             curr++;
         }
         std::cout << "here8 = " <<  tokens[curr].value << std::endl;
-        //tree.create_scope();
-        //st.stack_clear();
+        tree.create_scope();
+        st.stack_clear();
         int zap = POLIZ.size();
 
         push_poliz(std::to_string(zap));
@@ -485,7 +490,7 @@ private:
             //std::cout << "hghghkbkgnbk";
             curr++;
         }
-        //tree.exit_scope();
+        tree.exit_scope();
 
         POLIZ[zap].token->value = std::to_string(POLIZ.size()+1);
 
@@ -600,6 +605,7 @@ private:
             throw std::string ("error - miss { it line  " + std::to_string(tokens[curr - 2].line));
         }
         tree.create_scope();
+        st.stack_clear();
         list_instructions();
         if (tokens[curr++].value != "}") {
             throw std::string ("error - miss } it line  " + std::to_string(tokens[curr - 2].line));
@@ -803,7 +809,7 @@ private:
     }
 
     void level_3() {
-        level_2();
+        level_1();
         while (curr < tokens.size()) {
             if (tokens[curr].value == "*" || tokens[curr].value == "/") {
                 while(!st.operations.empty() && getPrecedence(st.operations.top()) >= getPrecedence(tokens[curr].value)){
@@ -813,7 +819,7 @@ private:
                 st.push_sem_stack_lex(tokens[curr].value);
 
                 ++curr;
-                level_2();
+                level_1();
                 check_bin();
             } else {
                 break;
@@ -821,33 +827,33 @@ private:
         }
     }
 
-    void level_2() {
-        //level_1();
-        //std::cout << "here5" << " " << tokens[curr].value << std::endl;
-        if (tokens[curr].value == "++" || tokens[curr].value == "--") {
-            st.push_sem_stack_lex(tokens[curr].value);
-            while(!st.operations.empty() && getPrecedence(st.operations.top()) >= getPrecedence(tokens[curr].value)){
-                push_poliz(Token(OPERATOR, st.operations.top(), -1));
-                st.operations.pop();
-            }
-
-            //std::cout << "CHECK " << tokens[curr].value << std::endl;
-            if (tokens[curr].type == LITERAL || tokens[curr].type == IDENTIFIER)
-            {
-                st.push_sem_stack_value(tokens[curr-1].value);
-                push_poliz(tokens[curr].value);
-            }
-
-            ++curr;
-            level_1();
-           // std::cout << "wwww";
-            check_uno();
-            //std::cout << "wwww";
-        } else {
-            //std::cout <<
-            level_1();
-        }
-    }
+//    void level_2() {
+//        //level_1();
+//        //std::cout << "here5" << " " << tokens[curr].value << std::endl;
+//        if (tokens[curr].value == "++" || tokens[curr].value == "--") {
+//            st.push_sem_stack_lex(tokens[curr].value);
+//            while(!st.operations.empty() && getPrecedence(st.operations.top()) >= getPrecedence(tokens[curr].value)){
+//                push_poliz(Token(OPERATOR, st.operations.top(), -1));
+//                st.operations.pop();
+//            }
+//
+//            //std::cout << "CHECK " << tokens[curr].value << std::endl;
+//            if (tokens[curr].type == LITERAL || tokens[curr].type == IDENTIFIER)
+//            {
+//                st.push_sem_stack_value(tokens[curr-1].value);
+//                push_poliz(tokens[curr].value);
+//            }
+//
+//            ++curr;
+//            level_1();
+//            // std::cout << "wwww";
+//            check_uno();
+//            //std::cout << "wwww";
+//        } else {
+//            //std::cout <<
+//            level_1();
+//        }
+//    }
 
     void level_1() {
         if (tokens[curr].type == LITERAL || tokens[curr].type == IDENTIFIER) {
@@ -870,7 +876,7 @@ private:
                 return;
             }
             std::cout << "error" << tokens[curr].value;
-             throw std::string ("error");
+            throw std::string ("error");
         }
     }
 
@@ -908,6 +914,7 @@ private:
                 //std::cout << "here7" << tp << std::endl;
                 std::string tp;
                 //std::cout << "here7" << tokens[curr].value << std::endl;
+
                 if (tree.check_id(tokens[curr].value).second == 0) {
                     //std::cout << "here7" << std::endl;
                     throw std::string("id is not found");
@@ -980,13 +987,13 @@ private:
         }
         // std::cout << "Check_bin" << type_l << type_r << std::endl;
         if (type_l == "int" && type_r == "int") {
-                st.types.push("int");
+            st.types.push("int");
         } else if ((type_l == "float" || type_l == "int") && (type_r == "float" || type_r == "int") ){
-                st.types.push("float");
+            st.types.push("float");
         } else if (type_l == "bool"  && type_r == "bool") {
-                st.types.push("bool");
+            st.types.push("bool");
         } else if((type_l == "bool" || type_l == "int")  && (type_r == "bool" || type_r == "int")) {
-                st.types.push("bool");
+            st.types.push("bool");
         } else if (type_l == "string" && type_r == "string") {
             if (operation == "==" || operation == "!=" || operation == "=") {
                 st.types.push("string");
