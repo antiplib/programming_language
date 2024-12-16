@@ -371,8 +371,6 @@ private:
             cur_func->parameters.push_back(y);
             st.types.pop();
             flag_for_comma = 1;
-
-
         }
         //std::cout << cur_func->parameters.size();
         if (tokens[curr].value == ")") {
@@ -580,12 +578,15 @@ private:
         if (tokens[curr++].value != "(") {
             throw std::string ("error - miss ( it line  " + std::to_string(tokens[curr - 2].line));
         }
+
         if (tokens[curr].value != ";") {
             declaration_id();
             check_semicolon();
         } else {
             curr++;
         }
+        int checker = POLIZ.size();
+
         if (tokens[curr].value != ";") {
             expression();
             check_bool();
@@ -593,23 +594,39 @@ private:
         } else {
             curr++;
         }
+
+        int poz = POLIZ.size();
+
+        push_poliz(std::to_string(poz));
+        push_poliz("!F");
+        push_poliz(std::to_string(poz));
+        push_poliz("F");
+        int update = POLIZ.size();
+
         if (tokens[curr].value != ")") {
             expression();
             if (tokens[curr++].value != ")") {
                 throw std::string ("error - miss ) it line  " + std::to_string(tokens[curr - 2].line));
             }
+            push_poliz(std::to_string(checker+1));
+            push_poliz("F");
         } else {
             curr++;
         }
         if (tokens[curr++].value != "{") {
             throw std::string ("error - miss { it line  " + std::to_string(tokens[curr - 2].line));
         }
+        POLIZ[poz+2].token->value= std::to_string(POLIZ.size()+1);
         tree.create_scope();
         st.stack_clear();
         list_instructions();
+        push_poliz(std::to_string(update+1));
+        push_poliz("F");
         if (tokens[curr++].value != "}") {
             throw std::string ("error - miss } it line  " + std::to_string(tokens[curr - 2].line));
         }
+        POLIZ[poz].token->value =std::to_string( POLIZ.size()+1);
+
         tree.exit_scope();
     }
 

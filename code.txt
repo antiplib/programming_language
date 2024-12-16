@@ -14,7 +14,7 @@ int main() {
     } else {
         a = 3;
     }
-    for (int i = 0; i < n; ++i) {
+    for (int i = 0; i < n; i+=1) {
         int d = 0;
     }
     return 5;
