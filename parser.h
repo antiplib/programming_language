@@ -311,6 +311,8 @@ private:
                     curr -= 1;
                     declaration_many_id();
                     check_semicolon();
+                    push_poliz(";");
+
                 }
             }
         }
@@ -322,6 +324,8 @@ private:
         if (function->type_answer == "void") {
             push_poliz("RETURN");
             check_semicolon();
+            push_poliz(";");
+
             return;
         }
         flag_for_comma = 1;
@@ -329,11 +333,12 @@ private:
         flag_for_comma = 0;
         std::string tp = st.types.top();
         st.types.pop();
-        push_poliz(st.values.top());
-        st.values.pop();
         push_poliz("RETURN");
         if (function->type_answer == tp) {
             check_semicolon();
+            push_poliz(";");
+
+
 
         } else {
             throw std::string ("wrong type of return");
@@ -343,7 +348,7 @@ private:
     }
 
     void call_function() {
-        push_poliz(tokens[curr], true);
+        auto e = (tokens[curr]);
         if (tokens[curr].type == IDENTIFIER) {
             curr++;
         } else {
@@ -372,6 +377,7 @@ private:
             st.types.pop();
             flag_for_comma = 1;
         }
+        push_poliz(e, true);
         //std::cout << cur_func->parameters.size();
         if (tokens[curr].value == ")") {
             ++curr;
@@ -431,7 +437,7 @@ private:
         int zap2 = POLIZ.size();
         push_poliz(std::to_string(zap2));
 
-        push_poliz("F");
+        push_poliz("!");
         //std::cout << "IF2" << " " << tokens[curr].value << std::endl;
         if (tokens[curr++].value != "}") {
             throw std::string ("error - miss } it line  " + std::to_string(tokens[curr - 2].line));
@@ -477,7 +483,7 @@ private:
         list_instructions();
         int zap2 = POLIZ.size();
         push_poliz(std::to_string(zap2));
-        push_poliz("F");
+        push_poliz("!");
 
         std::cout << "here9 = " << tokens[curr].value << std::endl;
         //curr++;
@@ -508,8 +514,12 @@ private:
         if (tokens[curr++].value != "(") {
             throw std::string ("error - miss ( it line  " + std::to_string(tokens[curr].line));
         }
+        int checker = POLIZ.size();
         expression();
         check_bool();
+        int zap = POLIZ.size();
+        push_poliz(std::to_string(zap));
+        push_poliz("!F");
         if (tokens[curr++].value != ")") {
             throw std::string ("error - miss ) it line  " + std::to_string(tokens[curr - 2].line));
         }
@@ -519,9 +529,12 @@ private:
         tree.create_scope();
         st.stack_clear();
         list_instructions();
+        push_poliz(std::to_string(checker));
+        push_poliz("!");
         if (tokens[curr++].value != "}") {
             throw std::string ("error - miss } it line  " + std::to_string(tokens[curr - 2].line));
         }
+        POLIZ[zap].token->value = std::to_string(POLIZ.size());
         tree.exit_scope();
     }
 
@@ -600,7 +613,7 @@ private:
         push_poliz(std::to_string(poz));
         push_poliz("!F");
         push_poliz(std::to_string(poz));
-        push_poliz("F");
+        push_poliz("!");
         int update = POLIZ.size();
 
         if (tokens[curr].value != ")") {
@@ -609,7 +622,7 @@ private:
                 throw std::string ("error - miss ) it line  " + std::to_string(tokens[curr - 2].line));
             }
             push_poliz(std::to_string(checker+1));
-            push_poliz("F");
+            push_poliz("!");
         } else {
             curr++;
         }
@@ -621,7 +634,7 @@ private:
         st.stack_clear();
         list_instructions();
         push_poliz(std::to_string(update+1));
-        push_poliz("F");
+        push_poliz("!");
         if (tokens[curr++].value != "}") {
             throw std::string ("error - miss } it line  " + std::to_string(tokens[curr - 2].line));
         }
@@ -637,6 +650,8 @@ private:
             declaration_many_id();
             //std::cout << "here3" << std::endl;
             check_semicolon();
+            push_poliz(";");
+
         } else if (tokens[curr].value == "if") {
             function_if();
         } else if (tokens[curr].value == "for") {
@@ -649,9 +664,13 @@ private:
         } else if (tokens[curr].value == "break") {
             curr++;
             check_semicolon();
+            push_poliz(";");
+
         } else if (tokens[curr].value == "continue") {
             curr++;
             check_semicolon();
+            push_poliz(";");
+
         }  else {
             if (tokens[curr].value == "}" || tokens[curr].value == "return") {
                 //std::cout << "end" << std::endl;
@@ -667,6 +686,7 @@ private:
                 expression();
                 //std::cout << "CHECH2 " << tokens[curr].value;
                 check_semicolon();
+                push_poliz(";");
                 //std::cout << "CHECH2 " << tokens[curr].value;
             }
         }
