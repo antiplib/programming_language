@@ -118,7 +118,7 @@ extern int  read_file() {
                 lexeme += buffer[i];
                 ++i;
             }
-            tokens.push_back(Token(LITERAL, lexeme, line));
+            tokens.push_back(Token(LITERAL2, lexeme, line));
             ++i;
             continue;
         }

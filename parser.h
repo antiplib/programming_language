@@ -139,7 +139,7 @@ private:
                 ++curr;
                 if (tokens[curr].value == "{") {
                     ++curr;
-                    if (tokens[curr].type == LITERAL || tokens[curr].type == IDENTIFIER) {
+                    if (tokens[curr].type == LITERAL ||tokens[curr].type == LITERAL2|| tokens[curr].type == IDENTIFIER) {
                         //tree.push_id(pr);
                         //parametr pr(type, tokens[curr].value);
                         ++curr;
@@ -153,7 +153,7 @@ private:
 //                            type = tokens[curr].value;
 //                            ++curr;
 //                        }
-                        if (tokens[curr].type == LITERAL || tokens[curr].type == IDENTIFIER) {
+                        if (tokens[curr].type == LITERAL|| tokens[curr].type == LITERAL2 || tokens[curr].type == IDENTIFIER) {
                             //parametr pr(type, tokens[curr].value);
                             ++curr;
                         } else {
@@ -276,10 +276,16 @@ private:
 
     void declaration() {
         //std::cout << "SIZE= " << tokens.size() << std::endl;
+        int cnt = 0;
         while (curr < tokens.size() - 1) {
             //std::cout << "curr" << curr;
+            if(cnt > 2) {
+                throw std::string ("error - function is not declarated\n");
+            }
+            cnt++;
             if (tokens[curr].value == "void" || tokens[curr].value == "int" || tokens[curr].value == "string" ||
                 tokens[curr].value == "double") {
+                cnt = 0;
                 curr++;
                 bool f = 0;
                 if (tokens[curr].value == "[") {
@@ -893,7 +899,7 @@ private:
 //    }
 
     void level_1() {
-        if (tokens[curr].type == LITERAL || tokens[curr].type == IDENTIFIER) {
+        if (tokens[curr].type == LITERAL ||tokens[curr].type == LITERAL2 || tokens[curr].type == IDENTIFIER) {
             level_0();
         } else if (curr < tokens.size() && tokens[curr].value == "(") {
             ++curr;
@@ -919,7 +925,7 @@ private:
 
     void level_0() {
         //std::cout << "here6" << " " << tokens[curr].value << std::endl;
-        if (tokens[curr].type == LITERAL) {
+        if (tokens[curr].type == LITERAL || tokens[curr].type ==LITERAL2) {
             bool fl_chislo = 1;
             bool fl_float = 0;
             for (int i = 0; i < tokens[curr].value.size(); ++i ) {
@@ -930,7 +936,8 @@ private:
                     fl_float = 1;
                 }
             }
-            if (!fl_chislo) {
+
+            if (!fl_chislo || tokens[curr].type ==LITERAL2) {
                 st.push_sem_stack_type("string");
             } else {
                 if (fl_float) {

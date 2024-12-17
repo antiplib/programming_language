@@ -9,10 +9,11 @@ int main() {
     int c = 5;
     c = a;
     if (a < b) {
-        int d;
-        c += 1;
+        string d;
+        d = "34634";
     } elif ( a < b) {
         ++c;
+
     } else {
         a = 3;
     }
