@@ -34,7 +34,7 @@ inline bool need(Token token) {
 
 inline bool is_operand(Token token) {
     bool ans = 0;
-    ans = token.type == TokenType::LITERAL || token.type == TokenType::IDENTIFIER;
+    ans = token.type == TokenType::LITERAL || token.type == TokenType::IDENTIFIER || token.type == TokenType::LITERAL2;
     return ans;
 }
 inline bool is_operator(Token token) {

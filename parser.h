@@ -14,7 +14,6 @@ extern std::vector<Token> tokens;
 extern std::string project;
 extern Bor keywords;
 extern std::vector<node> POLIZ;
-
 int getPrecedence(const std::string& op) {
     if (op == "++" || op == "--") return 6; //Унарный
     if (op == "*" || op == "/") return 5;
@@ -197,6 +196,10 @@ private:
         curr++;
         // push_poliz("FUNC_START");
         push_poliz(name);
+
+        if(name == "main") {
+            POLIZ[0].token->value = std::to_string(POLIZ.size() +1);
+        }
         push_poliz(tp);
         func *cur_func = new func(tp, name);
         push_func(cur_func);
@@ -318,7 +321,6 @@ private:
                     declaration_many_id();
                     check_semicolon();
                     push_poliz(";");
-
                 }
             }
         }
@@ -535,12 +537,12 @@ private:
         tree.create_scope();
         st.stack_clear();
         list_instructions();
-        push_poliz(std::to_string(checker));
+        push_poliz(std::to_string(checker+1));
         push_poliz("!");
         if (tokens[curr++].value != "}") {
             throw std::string ("error - miss } it line  " + std::to_string(tokens[curr - 2].line));
         }
-        POLIZ[zap].token->value = std::to_string(POLIZ.size());
+        POLIZ[zap].token->value = std::to_string(POLIZ.size()+1);
         tree.exit_scope();
     }
 
@@ -911,8 +913,10 @@ private:
             }
         } else if (tokens[curr].value == "++" || tokens[curr].value == "--") {
             st.push_sem_stack_lex(tokens[curr].value);
+            std::string ss = tokens[curr].value;
             ++curr;
             level_0();
+            push_poliz(Token(OPERATOR, ss, -1));
             check_uno();
         }  else  {
             if (tokens[curr ].value == "{") {
@@ -979,6 +983,8 @@ private:
     }
 
     void programma() {
+        push_poliz("a");
+        push_poliz("!");
         try {
             declaration();
         } catch(std::string c) {

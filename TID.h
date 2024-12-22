@@ -50,6 +50,23 @@ public:
         }
 
     }
+
+    std::string get_val_id(const std::string& id){
+        for (const parametr& i : parametrs) {
+            if (i.id == id) {
+                return i.value;
+            }
+        }
+    }
+
+    void set_val_id(const std::string& id, std::string& val) {
+        for (parametr& i : parametrs) {
+            if (i.id == id) {
+                i.value = (val);
+            }
+        }
+    }
+
 private:
     std::vector<parametr> parametrs;
 };

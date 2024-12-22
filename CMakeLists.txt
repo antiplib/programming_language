@@ -12,4 +12,5 @@ add_executable(programming_language main.cpp
         parser.h
         TID.h
         Poliz.h
+        Interpretator.h
 )

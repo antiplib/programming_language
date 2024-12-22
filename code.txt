@@ -3,15 +3,13 @@ string f(int b){
     return "434 балла";
 }
 
-int fg = 90;
-
 int main() {
     int a;
     int b;
     int n;
     int c = 5;
     c = a;
-    fg = b;
+    ++a;
     if (a < b) {
         string b;
         b = "34634";
@@ -22,14 +20,13 @@ int main() {
         a = 3;
     }
     b = 90987;
-    for (int i = 0; i < n; i+=1) {
+    for (int i = 0; i < n; ++i) {
         int d = 0;
     }
+    a = 1234;
     while(a < 25){
         a+=1;
     }
     string a = f(5);
     return 5;
-
-
 }
