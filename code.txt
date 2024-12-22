@@ -6,7 +6,7 @@ int main() {
     int a;
     int b;
     cin >> a >> b;
-    cout << a;
+    cout << a << b;
     int n;
     int c = 5;
     c = a;
