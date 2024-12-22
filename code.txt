@@ -2,31 +2,31 @@
 string f(int b){
     return "434 балла";
 }
-
 int main() {
     int a;
     int b;
+    cin >> a >> b;
+    cout << a;
     int n;
     int c = 5;
     c = a;
-    ++a;
     if (a < b) {
-        string b;
-        b = "34634";
+        string d;
+        d = "34634";
     } elif ( a < b) {
         ++c;
 
     } else {
         a = 3;
     }
-    b = 90987;
-    for (int i = 0; i < n; ++i) {
+    for (int i = 0; i < n; i+=1) {
         int d = 0;
     }
-    a = 1234;
     while(a < 25){
         a+=1;
     }
     string a = f(5);
     return 5;
+
+
 }

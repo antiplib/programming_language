@@ -188,6 +188,52 @@ private:
     void list_instructions() {
         instruction();
     }
+    void function_cin() {
+        curr++;
+        if (tokens[curr].value != ">>") {
+            throw std::string ("error - miss << ");
+        } else {
+            curr++;
+        }
+        if (tokens[curr].type == IDENTIFIER) {
+            curr++;
+        } else {
+            throw std::string ("error - miss literal or id");
+        }
+        if (tree.check_id(tokens[curr - 1].value).second == 0) {
+            throw std::string("id is not found");
+        }
+        while (tokens[curr].value == ">>") {
+            curr++;
+            if (tokens[curr].type == IDENTIFIER) {
+                if (tree.check_id(tokens[curr].value).second == 0) {
+                    throw std::string("id is not found");
+                }
+                curr++;
+            } else {
+                throw std::string ("error - miss literal or id");
+            }
+        }
+
+        check_semicolon();
+    }
+    void function_cout() {
+        curr++;
+        if (tokens[curr].value != "<<") {
+            throw std::string ("error - miss << ");
+        } else {
+            curr++;
+        }
+        expression();
+        while (tokens[curr].value == "<<") {
+            curr++;
+            expression();
+
+        }
+        check_semicolon();
+    }
+
+
 
     void function() {
         std::string tp = tokens[curr].value;
@@ -318,7 +364,9 @@ private:
                         throw std::string ("error - miss ( it line  " + std::to_string(tokens[curr - 1].line));
                     }
                     curr -= 1;
+                    tree.create_scope();
                     declaration_many_id();
+                    tree.exit_scope();
                     check_semicolon();
                     push_poliz(";");
                 }
@@ -669,10 +717,15 @@ private:
             function_while();
         } else if (tokens[curr].value == "switch") {
             function_switch();
+        } else if (tokens[curr].value == "cin") {
+            function_cin();
+        } else if (tokens[curr].value == "cout") {
+            function_cout();
         } else if (tokens[curr].value == "break") {
-            curr++;
-            check_semicolon();
-            push_poliz(";");
+                curr++;
+                check_semicolon();
+                push_poliz(";");
+
 
         } else if (tokens[curr].value == "continue") {
             curr++;

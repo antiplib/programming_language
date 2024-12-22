@@ -3,6 +3,7 @@
 #include <iostream>
 #include <vector>
 #include "parser.h"
+#include "TID.h"
 
 extern std::vector<Token> tokens;
 extern std::string project;
@@ -26,6 +27,7 @@ void get_filename(int argc, char* argv[]) {
 
 int main(int argc, char* argv[]) {
     get_filename(argc, argv);
+    //GlobalScope globalScope;
     Parser parser(lexer());
     for (auto i : tokens)  {
         std::cout << i << std::endl;
