@@ -113,11 +113,11 @@ private:
         } else {
             throw std::string ("error - miss IDENTIFIER it line  " + std::to_string(tokens[curr].line));
         }
-        parametr pr(type, tokens[curr - 1].value);
+        parametr *pr = new parametr(type, tokens[curr - 1].value);
         //std::cout << "NET" << tokens[curr].value << std::endl;
         push_poliz(type);
         push_poliz(tokens[curr - 1].value);
-
+        set_param(pr);
         if (tokens[curr].value == "=") {
             ++curr;
             flag_for_comma = 0;
@@ -272,6 +272,7 @@ private:
             push_poliz(tp);
             push_poliz(name);
             parametr * x = new parametr(tp, name);
+            set_param(x);
             cur_func->parameters.push_back(x);
             tree.push_id(*x);
             while (tokens[curr].value == ",") {
@@ -292,6 +293,8 @@ private:
                 push_poliz(tp);
                 push_poliz(name);
                 parametr * x = new parametr(tp, name);
+                set_param(x);
+
                 cur_func->parameters.push_back(x);
                 tree.push_id(*x);
             };
@@ -1025,6 +1028,7 @@ private:
                 }
                 st.push_sem_stack_type(tp);
                 push_poliz(tokens[curr], false);
+                set_param();
                 ++curr;
             }
         } else if (tokens[curr].value == ";") {

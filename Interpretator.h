@@ -120,12 +120,12 @@ class Interpretator {
             }
             else if(POLIZ[curr].token->value == "!") {
             } else if(POLIZ[curr].token->value == "!F") {
-            } else if(POLIZ[curr].token->type == TokenType::IDENTIFIER) {
-            } else if(POLIZ[curr].token->type == TokenType::KEYWORD) {
-            }else if (POLIZ[curr] == "int") {
+            } else if (POLIZ[curr] == "int") {
             } else if (POLIZ[curr] == "double") {
             } else if (POLIZ[curr] == "string") {
             } else if (POLIZ[curr] == "return") {
+            } else if (POLIZ[curr] == "cin") {
+            } else if (POLIZ[curr] == "cout") {
             } else {
             }
         }

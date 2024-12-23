@@ -18,6 +18,7 @@ struct node {
     }
     bool is_operand = false;
     Token *token;
+    parametr*p  =nullptr;
     int ind = 0;
     bool is_func;
 
@@ -31,6 +32,8 @@ inline bool need(Token token) {
                     token.type == TokenType::COMMA;
 
 }
+
+
 
 inline bool is_operand(Token token) {
     bool ans = 0;
@@ -83,6 +86,9 @@ void push_poliz(std::string s) {
         else {
             POLIZ.push_back(node(token,0, is_function));
         }
+}
+void set_param(parametr *param) {
+    POLIZ[POLIZ.size() - 1].p = param;
 }
 
 
